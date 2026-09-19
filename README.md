@@ -5,7 +5,7 @@
 **A Git-backed storage platform for building information management applications**
 — requirements, issues, PLM, documentation — where the domain model is configuration, not code.
 
-[![CI](https://github.com/thomdehoog/origoa-foundation-for-lutz/actions/workflows/ci.yml/badge.svg)](https://github.com/thomdehoog/origoa-foundation-for-lutz/actions/workflows/ci.yml)
+[![CI](https://github.com/thomdehoog/corestone/actions/workflows/ci.yml/badge.svg)](https://github.com/thomdehoog/corestone/actions/workflows/ci.yml)
 [![Go](https://img.shields.io/badge/Go-1.24-00ADD8?logo=go&logoColor=white)](go.mod)
 [![Frontend](https://img.shields.io/badge/Frontend-Lit%20%2B%20TypeScript-324FFF?logo=lit&logoColor=white)](web/)
 [![Projection](https://img.shields.io/badge/Projection-PostgreSQL-4169E1?logo=postgresql&logoColor=white)](docs/INSTALL.md)

@@ -29,7 +29,7 @@ or automatically when the stored revision no longer matches the repository.
 ## 3. Build
 
 ```sh
-git clone https://github.com/thomdehoog/origoa-foundation-for-lutz.git corestone
+git clone https://github.com/thomdehoog/corestone.git
 cd corestone
 make build            # builds web/dist (npm install + typecheck + bundle) and bin/corestone
 ```

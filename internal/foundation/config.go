@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/scanner"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/scanner"
 )
 
 // PutSchema stores a schema definition for a type in a scope.
@@ -71,8 +71,8 @@ func (f *Foundation) putConfig(ctx context.Context, scope, category, name string
 			return &changeset{}, nil
 		}
 		cs := &changeset{subject: fmt.Sprintf("%s %s in %s %s", what, name, folderName(scope), verb)}
-		cs.trailer("Groundsill-Op", "config")
-		cs.trailer("Groundsill-Path", path)
+		cs.trailer("Corestone-Op", "config")
+		cs.trailer("Corestone-Path", path)
 		cs.ops = []gitx.Op{{Path: path, Content: content}}
 		cs.event = Event{Op: "config", Subject: path}
 		return cs, nil
@@ -107,8 +107,8 @@ func (f *Foundation) deleteConfig(ctx context.Context, scope, category, name, wh
 			return nil, err
 		}
 		cs := &changeset{subject: fmt.Sprintf("%s %s in %s deleted", what, name, folderName(scope))}
-		cs.trailer("Groundsill-Op", "config")
-		cs.trailer("Groundsill-Path", path)
+		cs.trailer("Corestone-Op", "config")
+		cs.trailer("Corestone-Path", path)
 		cs.ops = []gitx.Op{{Path: path, Delete: true}}
 		cs.event = Event{Op: "config", Subject: path}
 		return cs, nil
@@ -121,7 +121,7 @@ func ValidateAttachmentName(name string) error {
 	if err := model.ValidateSegment(name); err != nil {
 		return err
 	}
-	if name == model.GUIDFile || strings.HasPrefix(name, ".groundsill") {
+	if name == model.GUIDFile || strings.HasPrefix(name, ".corestone") {
 		return model.Invalid("%q is reserved", name)
 	}
 	return nil
@@ -145,8 +145,8 @@ func (f *Foundation) PutAttachment(ctx context.Context, guid, name string, conte
 			return &changeset{}, nil
 		}
 		cs := &changeset{subject: fmt.Sprintf("Attachment %s of %s stored", name, label(cur.Artifact))}
-		cs.trailer("Groundsill-Op", "attachment")
-		cs.trailer("Groundsill-Guid", guid)
+		cs.trailer("Corestone-Op", "attachment")
+		cs.trailer("Corestone-Guid", guid)
 		cs.ops = []gitx.Op{{Path: path, Content: content}}
 		cs.event = Event{Op: "attachment", GUID: guid, Kind: string(cur.Kind)}
 		return cs, nil
@@ -172,8 +172,8 @@ func (f *Foundation) DeleteAttachment(ctx context.Context, guid, name string) er
 			return nil, err
 		}
 		cs := &changeset{subject: fmt.Sprintf("Attachment %s of %s removed", name, label(cur.Artifact))}
-		cs.trailer("Groundsill-Op", "attachment")
-		cs.trailer("Groundsill-Guid", guid)
+		cs.trailer("Corestone-Op", "attachment")
+		cs.trailer("Corestone-Guid", guid)
 		cs.ops = []gitx.Op{{Path: path, Delete: true}}
 		cs.event = Event{Op: "attachment", GUID: guid, Kind: string(cur.Kind)}
 		return cs, nil

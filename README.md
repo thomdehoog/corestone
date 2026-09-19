@@ -1,6 +1,6 @@
 <div align="center">
 
-# Groundsill
+# Corestone
 
 **A Git-backed storage platform for building information management applications**
 — requirements, issues, PLM, documentation — where the domain model is configuration, not code.
@@ -12,7 +12,7 @@
 [![Source of truth](https://img.shields.io/badge/Source%20of%20truth-Git-F05032?logo=git&logoColor=white)](#how-it-works)
 [![License](https://img.shields.io/badge/License-Apache%202.0-D22128?logo=apache&logoColor=white)](LICENSE)
 
-<img src="docs/screenshot.png" alt="Groundsill web client: folder and type navigation, the artifact overview with HIDs and workflow states, and a schema-generated detail view" width="900">
+<img src="docs/screenshot.png" alt="Corestone web client: folder and type navigation, the artifact overview with HIDs and workflow states, and a schema-generated detail view" width="900">
 
 *The generic client renders itself from the repository's schemas: navigation, overview columns,
 detail sections, workflows and relationship types all come from configuration.*
@@ -28,20 +28,20 @@ native artifact kinds and nothing about any business domain:
 
 | Kind | Purpose | Stored at |
 |---|---|---|
-| **Entry** | Reusable structured object (requirement, ticket, part, …); may be an *overlay* of another entry | `<folder>/<guid>/.groundsill.json` |
-| **Document** | Hierarchical composition: sections, text, media and references to entries | `<folder>/<guid>/.groundsill.json` |
-| **Link** | Directed, typed relationship between any two artifacts | `<scope>/.groundsill/links/<guid>.json` |
-| **Comment** | Threaded annotation on any artifact (whole artifact, a field, a document element) | `<scope>/.groundsill/comments/<guid>.json` |
+| **Entry** | Reusable structured object (requirement, ticket, part, …); may be an *overlay* of another entry | `<folder>/<guid>/.corestone.json` |
+| **Document** | Hierarchical composition: sections, text, media and references to entries | `<folder>/<guid>/.corestone.json` |
+| **Link** | Directed, typed relationship between any two artifacts | `<scope>/.corestone/links/<guid>.json` |
+| **Comment** | Threaded annotation on any artifact (whole artifact, a field, a document element) | `<scope>/.corestone/comments/<guid>.json` |
 
 Everything domain-specific lives in JSON configuration inside the repository:
 
-- **Schemas** (`<scope>/.groundsill/schemas/<type>.json`) define artifact types — fields with the
+- **Schemas** (`<scope>/.corestone/schemas/<type>.json`) define artifact types — fields with the
   Foundation's generic field types, HID generation, workflow assignments, link-type endpoint rules
   and cardinality, presentation hints. Schemas compose **lexically** from the repository root to the
   artifact: nearer definitions refine or replace, `"inheritance": "off"` severs everything above.
-- **Workflows** (`<scope>/.groundsill/workflows/<id>.json`) are state machines; an artifact can be in
+- **Workflows** (`<scope>/.corestone/workflows/<id>.json`) are state machines; an artifact can be in
   several at once, each with its own state.
-- **Scanner configuration** (`.groundsill/scanner.json`) tells the repository scanner which markers to
+- **Scanner configuration** (`.corestone/scanner.json`) tells the repository scanner which markers to
   look for (GUID files, configuration folders, indexers), so applications can extend the format.
 
 ## How it works
@@ -50,7 +50,7 @@ Everything domain-specific lives in JSON configuration inside the repository:
 
 **Git is the single source of truth.** A bare repository holds every artifact and every piece of
 configuration; each logical operation is exactly one commit with a structured message
-(`Entry REQ-42 in specs/boot created`, plus `Groundsill-Op` / `Groundsill-Guid` trailers). Commits are built
+(`Entry REQ-42 in specs/boot created`, plus `Corestone-Op` / `Corestone-Guid` trailers). Commits are built
 with plumbing only — no working directory — and published with a compare-and-swap `update-ref`.
 
 **PostgreSQL is a rebuildable projection.** Plain SQL, no ORM. It holds the GUID → path table, the
@@ -84,10 +84,10 @@ Requirements: Go 1.24+, git, Node 22+ (web client), PostgreSQL 14+ (16 recommend
 `ltree` extension available.
 
 ```sh
-createdb groundsill
-make build                      # web/dist + bin/groundsilld
-./bin/groundsilld -repo data/groundsill.git -addr 127.0.0.1:8080 -web web/dist \
-  -db "postgres://user:pass@localhost:5432/groundsill?sslmode=disable"
+createdb corestone
+make build                      # web/dist + bin/corestone
+./bin/corestone -repo data/corestone.git -addr 127.0.0.1:8080 -web web/dist \
+  -db "postgres://user:pass@localhost:5432/corestone?sslmode=disable"
 ./examples/seed.sh              # a demo requirements domain
 ```
 
@@ -154,7 +154,7 @@ cardinality, contention), 412 stale `If-Match`, 503 maintenance mode or projecti
 ## Repository layout
 
 ```
-cmd/groundsilld       server binary: flags, security headers, access log, health probe, graceful shutdown
+cmd/corestone       server binary: flags, security headers, access log, health probe, graceful shutdown
 internal/gitx         bare-repository plumbing: CAS commits, batched reads, first-parent history walks
 internal/ojson        order-preserving, format-preserving JSON
 internal/model        kinds, GUIDs/HIDs, folder rules, field types, schema composition, workflows, overlays, content
@@ -168,12 +168,12 @@ web/                  Lit + TypeScript client and Playwright tests
 ## Testing
 
 ```sh
-export GROUNDSILL_TEST_DSN=postgres://postgres:postgres@127.0.0.1:5432/groundsill_test?sslmode=disable
+export CORESTONE_TEST_DSN=postgres://postgres:postgres@127.0.0.1:5432/corestone_test?sslmode=disable
 make test        # go vet, gofmt gate, all packages with -race (PostgreSQL-backed tests skip without the DSN)
 make lint        # golangci-lint (errcheck, staticcheck, govet, unused, ...); CI runs it too
 make fuzz        # fuzz smoke: JSON codec fixed point, folder validation envelope, scanner classification
 make e2e         # REST end-to-end script against a temporary server
-make test-ui     # Playwright smoke suite; make test-ui-all runs every browser suite (needs the groundsill_e2e database): the + New flow, every field type through the
+make test-ui     # Playwright smoke suite; make test-ui-all runs every browser suite (needs the corestone_e2e database): the + New flow, every field type through the
                  # generated form, attachments, the block editor, workflows, relationships, overlays, HID renames, moves,
                  # search and deep links, keyboard shortcuts, responsive and dark mode, reindex, two users in separate
                  # contexts (presence, live updates, conflicts), plus adversarial cases (script-looking content,
@@ -197,8 +197,8 @@ verified on every run rather than assumed.
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Source tour and how a request flows |
 | [DESIGN_NOTES.md](DESIGN_NOTES.md) | Design guide vs. implementation: adopted, adapted, deferred, and what testing found |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | What is still missing, ranked by how much it blocks a deployment, with a plan for each item |
-| [docs/Groundsill_Roadmap.docx](docs/Groundsill_Roadmap.docx) ([PDF](docs/Groundsill_Roadmap.pdf)) | The roadmap as a specification document in the format of the design guide, for sharing |
+| [docs/Corestone_Roadmap.docx](docs/Corestone_Roadmap.docx) ([PDF](docs/Corestone_Roadmap.pdf)) | The roadmap as a specification document in the format of the design guide, for sharing |
 
 ## License
 
-Groundsill is released under the [Apache License 2.0](LICENSE).
+Corestone is released under the [Apache License 2.0](LICENSE).

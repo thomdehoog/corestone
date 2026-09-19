@@ -2,7 +2,7 @@ import { LitElement, html, nothing } from "lit";
 import { customElement } from "lit/decorators.js";
 import { store, type State } from "./store";
 
-@customElement("groundsill-toasts")
+@customElement("corestone-toasts")
 export class Toasts extends LitElement {
   private unsub?: () => void;
   private s!: State;

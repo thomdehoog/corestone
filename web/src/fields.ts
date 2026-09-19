@@ -11,7 +11,7 @@ import { label, safeHref } from "./util";
 
 export type FieldValue = unknown;
 
-@customElement("groundsill-field")
+@customElement("corestone-field")
 export class FieldEditor extends LitElement {
   @property({ attribute: false }) field!: Field;
   @property({ attribute: false }) value: FieldValue = undefined;

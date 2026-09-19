@@ -3,7 +3,7 @@
 // decides which repository paths the Foundation cares about, and configured
 // indexers decide what to do with them. Everything else in the repository
 // is ignored, which keeps synchronization cheap and lets applications keep
-// their own files next to Groundsill's.
+// their own files next to Corestone's.
 package scanner
 
 import (
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/thomdehoog/groundsill/internal/model"
+	"github.com/thomdehoog/corestone/internal/model"
 )
 
 // ConfigPath is where the scanner configuration lives inside the repository.

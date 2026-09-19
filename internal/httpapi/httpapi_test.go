@@ -14,8 +14,8 @@ import (
 
 	"github.com/coder/websocket"
 
-	"github.com/thomdehoog/groundsill/internal/foundation"
-	"github.com/thomdehoog/groundsill/internal/testutil"
+	"github.com/thomdehoog/corestone/internal/foundation"
+	"github.com/thomdehoog/corestone/internal/testutil"
 )
 
 type api struct {
@@ -184,7 +184,7 @@ func TestRESTLifecycle(t *testing.T) {
 		t.Fatalf("attachment %q", f.raw)
 	}
 	a.ok("GET", "/api/artifacts/"+g1+"/files/missing.txt", "", 404)
-	a.ok("PUT", "/api/artifacts/"+g1+"/files/.groundsill.json", "x", 400)
+	a.ok("PUT", "/api/artifacts/"+g1+"/files/.corestone.json", "x", 400)
 
 	// search, tree, types, effective schema, history, hid lookup, validate, status
 	s := a.ok("GET", "/api/repository/search?q=boot&kind=entry", "", 200)

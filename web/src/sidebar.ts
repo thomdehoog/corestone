@@ -20,7 +20,7 @@ export function countTitle(f: FolderInfo): string {
   return below > 0 ? `${n(f.direct)} here, ${n(below)} in subfolders` : `${n(f.direct)} here`;
 }
 
-@customElement("groundsill-sidebar")
+@customElement("corestone-sidebar")
 export class Sidebar extends LitElement {
   private unsub?: () => void;
   private s!: State;
@@ -139,7 +139,7 @@ export class Sidebar extends LitElement {
       <div class="row ${selected ? "selected" : ""} ${n.pending ? "pending" : ""}" title=${n.pending ? "Not in the repository yet: created with the first artifact saved here" : ""} data-folder=${n.info.path} @click=${() => { navigate({ folder: n.info.path, guid: null, type: "", q: "" }); store.closeNavIfOverlay(); }}>
         <span class="caret ${hasKids ? "" : "empty"}" @click=${(e: Event) => { e.stopPropagation(); this.toggle(n); }}>${n.open ? "▾" : "▸"}</span>
         <span class="name">${depth === 0 ? html`<b>${n.info.name}</b>` : n.info.name}</span>
-        ${n.info.hasConfig ? html`<span class="badge" title="has a .groundsill metadata directory">.groundsill</span>` : nothing}
+        ${n.info.hasConfig ? html`<span class="badge" title="has a .corestone metadata directory">.corestone</span>` : nothing}
         ${n.info.artifacts ? html`<span class="count" title=${countTitle(n.info)}>${n.info.artifacts}</span>` : nothing}
       </div>
       ${n.open && n.children?.length ? html`<ul>

@@ -14,7 +14,7 @@ import "./fields";
 
 const SECTIONS = ["general", "fields", "workflows", "relationships", "comments", "attachments", "overlay", "history", "metadata"] as const;
 
-@customElement("groundsill-detail")
+@customElement("corestone-detail")
 export class Detail extends LitElement {
   @property() guid = "";
   private unsub?: () => void;
@@ -243,7 +243,7 @@ export class Detail extends LitElement {
     store.set({ dialog: { kind: "new", kinds: ["entry"], type: v.meta.type, folder: v.meta.folder, baseGuid: this.guid } });
     // the new dialog reads baseGuid via a small hook below
     window.setTimeout(() => {
-      const dlg = document.querySelector("groundsill-new-dialog") as (HTMLElement & { base: string; baseLabel: string }) | null;
+      const dlg = document.querySelector("corestone-new-dialog") as (HTMLElement & { base: string; baseLabel: string }) | null;
       if (dlg) { dlg.base = this.guid; dlg.baseLabel = label(v.meta); }
     }, 50);
   }
@@ -338,12 +338,12 @@ export class Detail extends LitElement {
     const extra = Object.keys(d.fields).filter((k) => !known.has(k));
     return html`<section class="section" id="sec-fields"><h3>Fields</h3>
       ${!fields.length && !extra.length ? html`<div class="muted small">No fields defined for this type. Add a schema to describe it.</div>` : nothing}
-      ${fields.map((f) => html`<groundsill-field .field=${f} .value=${d.fields[f.id]} .attachments=${this.view?.attachments ?? []}
+      ${fields.map((f) => html`<corestone-field .field=${f} .value=${d.fields[f.id]} .attachments=${this.view?.attachments ?? []}
         .inheritedFrom=${this.inheritedFrom(f.id)} @focusin=${this.touched}
         @field-change=${(e: CustomEvent) => { const next = { ...d.fields }; if (e.detail.value == null) delete next[e.detail.id]; else next[e.detail.id] = e.detail.value; this.draft = { ...d, fields: next }; this.touched(); }}
-        @open-artifact=${(e: CustomEvent) => navigate({ guid: e.detail })}></groundsill-field>`)}
-      ${extra.map((k) => html`<groundsill-field .field=${{ id: k, name: k + " (unschematized)", type: typeof d.fields[k] === "object" ? "json" : typeof d.fields[k] === "boolean" ? "boolean" : "text" }} .value=${d.fields[k]}
-        @field-change=${(e: CustomEvent) => { const next = { ...d.fields }; if (e.detail.value == null) delete next[e.detail.id]; else next[e.detail.id] = e.detail.value; this.draft = { ...d, fields: next }; this.touched(); }}></groundsill-field>`)}
+        @open-artifact=${(e: CustomEvent) => navigate({ guid: e.detail })}></corestone-field>`)}
+      ${extra.map((k) => html`<corestone-field .field=${{ id: k, name: k + " (unschematized)", type: typeof d.fields[k] === "object" ? "json" : typeof d.fields[k] === "boolean" ? "boolean" : "text" }} .value=${d.fields[k]}
+        @field-change=${(e: CustomEvent) => { const next = { ...d.fields }; if (e.detail.value == null) delete next[e.detail.id]; else next[e.detail.id] = e.detail.value; this.draft = { ...d, fields: next }; this.touched(); }}></corestone-field>`)}
     </section>`;
   }
 
@@ -435,7 +435,7 @@ export class Detail extends LitElement {
 
   private historySection() {
     return html`<section class="section" id="sec-history"><h3>History</h3>
-      ${this.history.map((h) => html`<div class="history-row"><span class="when" title=${h.time}>${fmtTime(h.time)}</span><span>${h.subject}${h.trailers?.["Groundsill-Op"] ? html` <span class="pill">${h.trailers["Groundsill-Op"]}</span>` : nothing}</span><span class="mono muted">${h.sha.slice(0, 8)}</span></div>`)}
+      ${this.history.map((h) => html`<div class="history-row"><span class="when" title=${h.time}>${fmtTime(h.time)}</span><span>${h.subject}${h.trailers?.["Corestone-Op"] ? html` <span class="pill">${h.trailers["Corestone-Op"]}</span>` : nothing}</span><span class="mono muted">${h.sha.slice(0, 8)}</span></div>`)}
       ${!this.history.length ? html`<div class="muted small">No history yet.</div>` : nothing}</section>`;
   }
 

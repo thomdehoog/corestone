@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/testutil"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/testutil"
 )
 
 // testDB opens a projection on a fresh, isolated PostgreSQL schema so tests
-// can run in parallel against one database. Requires GROUNDSILL_TEST_DSN.
+// can run in parallel against one database. Requires CORESTONE_TEST_DSN.
 func testDB(t *testing.T) (*DB, *gitx.Repo) {
 	t.Helper()
 	dsn := testutil.DSN(t)
@@ -59,15 +59,15 @@ func TestSyncReplayAndRebuildAgree(t *testing.T) {
 	ctx := context.Background()
 	g1, g2, l1, c1 := model.NewGUID(), model.NewGUID(), model.NewGUID(), model.NewGUID()
 
-	commit(t, repo, "schema", gitx.Op{Path: ".groundsill/schemas/req.json", Content: []byte(`{"type":"req","hid":{"prefix":"REQ"},"fields":[{"id":"prio","type":"text"}],"workflows":["dev"]}`)},
-		gitx.Op{Path: ".groundsill/workflows/dev.json", Content: []byte(`{"id":"dev","states":["open","done"],"transitions":[{"from":"open","to":"done"}]}`)},
+	commit(t, repo, "schema", gitx.Op{Path: ".corestone/schemas/req.json", Content: []byte(`{"type":"req","hid":{"prefix":"REQ"},"fields":[{"id":"prio","type":"text"}],"workflows":["dev"]}`)},
+		gitx.Op{Path: ".corestone/workflows/dev.json", Content: []byte(`{"id":"dev","states":["open","done"],"transitions":[{"from":"open","to":"done"}]}`)},
 		gitx.Op{Path: "README.md", Content: []byte("ignored")})
-	commit(t, repo, "e1", gitx.Op{Path: "specs/a/" + g1 + "/.groundsill.json", Content: entryJSON(g1, "req", "Boot fast", "REQ-1", `"fields":{"prio":"high","n":2},"workflows":{"dev":"open"}`)},
+	commit(t, repo, "e1", gitx.Op{Path: "specs/a/" + g1 + "/.corestone.json", Content: entryJSON(g1, "req", "Boot fast", "REQ-1", `"fields":{"prio":"high","n":2},"workflows":{"dev":"open"}`)},
 		gitx.Op{Path: "specs/a/" + g1 + "/notes.txt", Content: []byte("attachment")})
-	commit(t, repo, "e2", gitx.Op{Path: "specs/b/" + g2 + "/.groundsill.json", Content: entryJSON(g2, "req", "Show progress", "REQ-2", `"base":"`+g1+`"`)})
+	commit(t, repo, "e2", gitx.Op{Path: "specs/b/" + g2 + "/.corestone.json", Content: entryJSON(g2, "req", "Show progress", "REQ-2", `"base":"`+g1+`"`)})
 	commit(t, repo, "link+comment",
-		gitx.Op{Path: "specs/.groundsill/links/" + l1 + ".json", Content: []byte(fmt.Sprintf(`{"guid":%q,"kind":"link","type":"refines","source":%q,"target":%q}`, l1, g2, g1))},
-		gitx.Op{Path: "specs/.groundsill/comments/" + c1 + ".json", Content: []byte(fmt.Sprintf(`{"guid":%q,"kind":"comment","type":"comment","subject":%q,"text":"why?","author":"a","created":"2026-01-01T00:00:00.000000000Z"}`, c1, g1))})
+		gitx.Op{Path: "specs/.corestone/links/" + l1 + ".json", Content: []byte(fmt.Sprintf(`{"guid":%q,"kind":"link","type":"refines","source":%q,"target":%q}`, l1, g2, g1))},
+		gitx.Op{Path: "specs/.corestone/comments/" + c1 + ".json", Content: []byte(fmt.Sprintf(`{"guid":%q,"kind":"comment","type":"comment","subject":%q,"text":"why?","author":"a","created":"2026-01-01T00:00:00.000000000Z"}`, c1, g1))})
 
 	if err := p.Sync(ctx); err != nil { // first sync = rebuild
 		t.Fatal(err)
@@ -79,10 +79,10 @@ func TestSyncReplayAndRebuildAgree(t *testing.T) {
 	snap1 := snapshot(t, p)
 
 	// incremental: hid change + move + delete + attachment change
-	commit(t, repo, "rename hid", gitx.Op{Path: "specs/a/" + g1 + "/.groundsill.json", Content: entryJSON(g1, "req", "Boot fast", "REQ-100", `"fields":{"prio":"high"},"workflows":{"dev":"done"}`)})
-	commit(t, repo, "move", gitx.Op{Path: "specs/b/" + g2 + "/.groundsill.json", Delete: true},
-		gitx.Op{Path: "archive/" + g2 + "/.groundsill.json", Content: entryJSON(g2, "req", "Show progress", "REQ-2", `"base":"`+g1+`"`)})
-	commit(t, repo, "delete comment", gitx.Op{Path: "specs/.groundsill/comments/" + c1 + ".json", Delete: true},
+	commit(t, repo, "rename hid", gitx.Op{Path: "specs/a/" + g1 + "/.corestone.json", Content: entryJSON(g1, "req", "Boot fast", "REQ-100", `"fields":{"prio":"high"},"workflows":{"dev":"done"}`)})
+	commit(t, repo, "move", gitx.Op{Path: "specs/b/" + g2 + "/.corestone.json", Delete: true},
+		gitx.Op{Path: "archive/" + g2 + "/.corestone.json", Content: entryJSON(g2, "req", "Show progress", "REQ-2", `"base":"`+g1+`"`)})
+	commit(t, repo, "delete comment", gitx.Op{Path: "specs/.corestone/comments/" + c1 + ".json", Delete: true},
 		gitx.Op{Path: "specs/a/" + g1 + "/notes.txt", Delete: true})
 	if err := p.Sync(ctx); err != nil {
 		t.Fatal(err)
@@ -211,10 +211,10 @@ func TestHostileFilesNeverWedgeProjection(t *testing.T) {
 	g := model.NewGUID()
 	big := strings.Repeat("x", 600*1024)
 	commit(t, repo, "hostile",
-		gitx.Op{Path: "a/" + g + "/.groundsill.json", Content: []byte(`{"guid":"` + g + `","kind":"entry","type":"t","title":"nul\u0000here","fields":{"big":"` + big + `","weird":"\u0000"}}`)},
-		gitx.Op{Path: "a/" + model.NewGUID() + "/.groundsill.json", Content: []byte(`not json at all`)},
-		gitx.Op{Path: ".groundsill/schemas/bad.json", Content: []byte(`{"type":"other"}`)},
-		gitx.Op{Path: ".groundsill/links/" + model.NewGUID() + ".json", Content: []byte(`{"guid":"nope"}`)},
+		gitx.Op{Path: "a/" + g + "/.corestone.json", Content: []byte(`{"guid":"` + g + `","kind":"entry","type":"t","title":"nul\u0000here","fields":{"big":"` + big + `","weird":"\u0000"}}`)},
+		gitx.Op{Path: "a/" + model.NewGUID() + "/.corestone.json", Content: []byte(`not json at all`)},
+		gitx.Op{Path: ".corestone/schemas/bad.json", Content: []byte(`{"type":"other"}`)},
+		gitx.Op{Path: ".corestone/links/" + model.NewGUID() + ".json", Content: []byte(`{"guid":"nope"}`)},
 	)
 	if err := p.Sync(ctx); err != nil {
 		t.Fatal(err)
@@ -243,12 +243,12 @@ func TestForeignHistoryTriggersRebuild(t *testing.T) {
 	p, repo := testDB(t)
 	ctx := context.Background()
 	g := model.NewGUID()
-	c1 := commit(t, repo, "one", gitx.Op{Path: g + "/.groundsill.json", Content: entryJSON(g, "t", "one", "", "")})
+	c1 := commit(t, repo, "one", gitx.Op{Path: g + "/.corestone.json", Content: entryJSON(g, "t", "one", "", "")})
 	if err := p.Sync(ctx); err != nil {
 		t.Fatal(err)
 	}
 	// Rewrite history: a new root commit not descending from c1.
-	c2, _ := repo.BuildCommit(ctx, "", "rewritten", []gitx.Op{{Path: g + "/.groundsill.json", Content: entryJSON(g, "t", "rewritten", "", "")}})
+	c2, _ := repo.BuildCommit(ctx, "", "rewritten", []gitx.Op{{Path: g + "/.corestone.json", Content: entryJSON(g, "t", "rewritten", "", "")}})
 	if err := repo.Publish(ctx, c1, c2); err != nil {
 		t.Fatal(err)
 	}
@@ -306,8 +306,8 @@ func TestConfigCacheSurvivesCancelledRequest(t *testing.T) {
 	p, repo := testDB(t)
 	ctx := context.Background()
 	commit(t, repo, "config",
-		gitx.Op{Path: ".groundsill/schemas/req.json", Content: []byte(`{"type":"req","hid":{"prefix":"R"}}`)},
-		gitx.Op{Path: ".groundsill/workflows/dev.json", Content: []byte(`{"id":"dev","initial":"open","states":["open"]}`)})
+		gitx.Op{Path: ".corestone/schemas/req.json", Content: []byte(`{"type":"req","hid":{"prefix":"R"}}`)},
+		gitx.Op{Path: ".corestone/workflows/dev.json", Content: []byte(`{"id":"dev","initial":"open","states":["open"]}`)})
 	if err := p.Sync(ctx); err != nil {
 		t.Fatal(err)
 	}

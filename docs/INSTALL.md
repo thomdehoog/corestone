@@ -1,4 +1,4 @@
-# Installing and running Groundsill
+# Installing and running Corestone
 
 ## 1. Prerequisites
 
@@ -20,7 +20,7 @@ connecting role needs `CREATE` on the database (or create the extension once as 
 `CREATE EXTENSION ltree;`).
 
 ```sh
-createdb groundsill
+createdb corestone
 ```
 
 The database is disposable: everything in it is rebuilt from Git by `POST /api/repository/reindex`
@@ -29,34 +29,34 @@ or automatically when the stored revision no longer matches the repository.
 ## 3. Build
 
 ```sh
-git clone https://github.com/thomdehoog/origoa-foundation-for-lutz.git groundsill
-cd groundsill
-make build            # builds web/dist (npm install + typecheck + bundle) and bin/groundsilld
+git clone https://github.com/thomdehoog/origoa-foundation-for-lutz.git corestone
+cd corestone
+make build            # builds web/dist (npm install + typecheck + bundle) and bin/corestone
 ```
 
 API-only build without Node:
 
 ```sh
-go build -o bin/groundsilld ./cmd/groundsilld
+go build -o bin/corestone ./cmd/corestone
 ```
 
 ## 4. Run
 
 ```sh
-./bin/groundsilld -repo data/groundsill.git -addr 127.0.0.1:8080 -web web/dist \
-  -db "postgres://user:password@localhost:5432/groundsill?sslmode=disable"
+./bin/corestone -repo data/corestone.git -addr 127.0.0.1:8080 -web web/dist \
+  -db "postgres://user:password@localhost:5432/corestone?sslmode=disable"
 ```
 
 | Flag / env | Default | Meaning |
 |---|---|---|
-| `-repo` / `GROUNDSILL_REPO` | `data/groundsill.git` | path of the **bare** Git repository; created if missing. This is your data. |
-| `-branch` / `GROUNDSILL_BRANCH` | `main` | the branch the Foundation owns |
-| `-db` / `GROUNDSILL_DB` | *(required)* | PostgreSQL connection string |
-| `-addr` / `GROUNDSILL_ADDR` | `127.0.0.1:8080` | listen address |
-| `-web` / `GROUNDSILL_WEB` | `web/dist` | directory with the built client; `""` for API only |
-| `-watch` / `GROUNDSILL_WATCH` | `3s` | how often to check for direct Git pushes and resynchronize; `0` disables |
-| `-allow-origin` / `GROUNDSILL_ALLOW_ORIGIN` | *(none)* | extra origins (host patterns such as `app.example.com`, `*.example.com`) allowed to open WebSocket sessions; same-origin is always allowed |
-| `-access-log` / `GROUNDSILL_ACCESS_LOG=1` | off | one log line per HTTP request (method, path, status, size, duration, client) |
+| `-repo` / `CORESTONE_REPO` | `data/corestone.git` | path of the **bare** Git repository; created if missing. This is your data. |
+| `-branch` / `CORESTONE_BRANCH` | `main` | the branch the Foundation owns |
+| `-db` / `CORESTONE_DB` | *(required)* | PostgreSQL connection string |
+| `-addr` / `CORESTONE_ADDR` | `127.0.0.1:8080` | listen address |
+| `-web` / `CORESTONE_WEB` | `web/dist` | directory with the built client; `""` for API only |
+| `-watch` / `CORESTONE_WATCH` | `3s` | how often to check for direct Git pushes and resynchronize; `0` disables |
+| `-allow-origin` / `CORESTONE_ALLOW_ORIGIN` | *(none)* | extra origins (host patterns such as `app.example.com`, `*.example.com`) allowed to open WebSocket sessions; same-origin is always allowed |
+| `-access-log` / `CORESTONE_ACCESS_LOG=1` | off | one log line per HTTP request (method, path, status, size, duration, client) |
 | `-version` | | print the build version and exit |
 
 Check it is alive:
@@ -74,7 +74,7 @@ Populate a demo domain and open <http://127.0.0.1:8080>:
 
 ## 5. Define your own domain
 
-Groundsill has no built-in types. A domain is a set of schema and workflow files, stored through the
+Corestone has no built-in types. A domain is a set of schema and workflow files, stored through the
 API (each store is one commit) or committed directly into the repository.
 
 **A workflow** — a state machine that artifact types can reference:
@@ -138,7 +138,7 @@ The response carries the permanent `guid`, the generated HID (`REQ-1`), the init
 and an `ETag`. Every write is a Git commit:
 
 ```sh
-git --git-dir=data/groundsill.git log --oneline
+git --git-dir=data/corestone.git log --oneline
 ```
 
 ## 6. Direct Git access
@@ -165,7 +165,7 @@ restructuring is restored with `POST /api/repository/maintenance/relocate-metada
 - **Shutdown**: `SIGTERM` or `SIGINT` stops accepting requests, waits up to 10 seconds for in-flight
   ones, closes WebSocket sessions with "going away" and exits. A write that was already published to
   Git is never lost: the projection replays it on the next start.
-- **Back up the bare repository**: `git clone --mirror data/groundsill.git` is a complete backup. The
+- **Back up the bare repository**: `git clone --mirror data/corestone.git` is a complete backup. The
   database is derived.
 - **Several server processes** may share one repository and one database; writes are protected by
   the Git compare-and-swap and the database `processed_hash` CAS, and maintenance mode is
@@ -176,21 +176,21 @@ restructuring is restored with `POST /api/repository/maintenance/relocate-metada
 
   ```sh
   docker compose up --build          # http://127.0.0.1:8080
-  GROUNDSILL_VERSION=1.0.0 make docker   # or just the image, tagged groundsill:1.0.0
+  CORESTONE_VERSION=1.0.0 make docker   # or just the image, tagged corestone:1.0.0
   ```
 
 - A minimal systemd unit:
 
   ```ini
   [Unit]
-  Description=Groundsill
+  Description=Corestone
   After=network.target postgresql.service
 
   [Service]
-  ExecStart=/opt/groundsill/bin/groundsilld -repo /var/lib/groundsill/groundsill.git -addr 127.0.0.1:8080 \
-    -web /opt/groundsill/web/dist -db postgres://groundsill:secret@localhost/groundsill?sslmode=disable
+  ExecStart=/opt/corestone/bin/corestone -repo /var/lib/corestone/corestone.git -addr 127.0.0.1:8080 \
+    -web /opt/corestone/web/dist -db postgres://corestone:secret@localhost/corestone?sslmode=disable
   Restart=on-failure
-  User=groundsill
+  User=corestone
 
   [Install]
   WantedBy=multi-user.target
@@ -198,7 +198,7 @@ restructuring is restored with `POST /api/repository/maintenance/relocate-metada
 
 ## Troubleshooting
 
-- **`-db (or GROUNDSILL_DB) is required`** — the projection database is mandatory; see §2.
+- **`-db (or CORESTONE_DB) is required`** — the projection database is mandatory; see §2.
 - **`projection schema: ... ltree`** — the `ltree` extension could not be created: install
   `postgresql-contrib` or create the extension as a superuser once.
 - **HTTP 503 with `Retry-After`** — maintenance mode (a reindex or a large folder move is running;

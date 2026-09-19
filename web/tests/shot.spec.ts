@@ -9,7 +9,7 @@ test("screenshots", async ({ page }) => {
   await page.goto("/folder/specs?subtree=1");
   await page.waitForSelector("table.grid tbody tr");
   await page.locator("table.grid tbody tr", { hasText: "boots in under 2" }).first().click();
-  await page.waitForSelector("groundsill-detail .section");
+  await page.waitForSelector("corestone-detail .section");
   await page.waitForTimeout(800);
   await page.screenshot({ path: "shots/overview-detail.png" });
   await page.goto("/folder/docs");

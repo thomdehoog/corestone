@@ -32,14 +32,14 @@ func ParseKind(s string) (Kind, error) {
 }
 
 // IsFolderKind reports whether artifacts of this kind live in GUID
-// directories (entries, documents) rather than in .groundsill metadata.
+// directories (entries, documents) rather than in .corestone metadata.
 func (k Kind) IsFolderKind() bool { return k == KindEntry || k == KindDocument }
 
 // MetadataDir is the name of the hidden configuration/metadata directory.
-const MetadataDir = ".groundsill"
+const MetadataDir = ".corestone"
 
 // GUIDFile is the default marker file carrying an artifact's GUID.
-const GUIDFile = ".groundsill.json"
+const GUIDFile = ".corestone.json"
 
 var guidRe = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`)
 
@@ -86,7 +86,7 @@ func ValidateHID(hid string) error {
 }
 
 // ValidateTypeID checks an artifact type / workflow / link type identifier.
-// Identifiers double as file names below .groundsill, so they are restricted.
+// Identifiers double as file names below .corestone, so they are restricted.
 func ValidateTypeID(id string) error {
 	if id == "" || len(id) > 64 {
 		return Invalid("identifier %q must be 1-64 characters", id)

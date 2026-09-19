@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // Adversarial browser tests: content that tries to break or script the
 // client must render as inert text, and the client must stay usable.
 
-const base = process.env.GROUNDSILL_URL || "http://127.0.0.1:18090";
+const base = process.env.CORESTONE_URL || "http://127.0.0.1:18090";
 const api = base + "/api";
 const stamp = Date.now().toString(36);
 const folder = `adv-${stamp}`;
@@ -30,7 +30,7 @@ test("script-looking content is rendered as text everywhere", async ({ page }) =
   expect(e.status).toBe(201);
   await post("/comments", { subject: e.meta!.guid, text: xss, author: xss });
   await page.goto(`/artifact/${e.meta!.guid}`);
-  await expect(page.locator("groundsill-detail h2")).toHaveText(xss);
+  await expect(page.locator("corestone-detail h2")).toHaveText(xss);
   await expect(page.locator("table.grid tbody tr").first()).toContainText("<img src=x");
   await expect(page.locator("#sec-comments .comment .text")).toHaveText(xss);
   await expect(page.locator(".tree .row", { hasText: "<b>x<i>" })).toBeVisible();
@@ -78,16 +78,16 @@ test("double submit creates exactly one artifact", async ({ page }) => {
   await page.locator("#new-title").fill("only once");
   // two clicks in the same event loop turn: the second must be a no-op
   await page.locator("[data-test=create]").evaluate((b) => { (b as HTMLButtonElement).click(); (b as HTMLButtonElement).click(); });
-  await expect(page.locator("groundsill-detail h2")).toHaveText("only once");
+  await expect(page.locator("corestone-detail h2")).toHaveText("only once");
   const res = await (await fetch(`${api}/repository/search?path=${folder}/once&kind=entry`)).json();
   expect(res.total).toBe(1);
 });
 
 test("garbage deep links degrade gracefully", async ({ page }) => {
   await page.goto("/artifact/not-a-guid");
-  await expect(page.locator("groundsill-detail .empty-state")).toContainText("not available");
+  await expect(page.locator("corestone-detail .empty-state")).toContainText("not available");
   await page.goto("/artifact/00000000-0000-4000-8000-000000000000");
-  await expect(page.locator("groundsill-detail .empty-state")).toContainText("not available");
+  await expect(page.locator("corestone-detail .empty-state")).toContainText("not available");
   await page.goto("/folder/%2e%2e/%2e%2e?q=%00&kind=blob&tab=nope&sb=a,b");
   await expect(page.locator(".toolbar")).toBeVisible();
   await expect(page.locator(".notice.error, .toast.error").first()).toBeVisible();

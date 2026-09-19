@@ -71,7 +71,7 @@ func ArtifactDir(folder, guid string) string {
 	return folder + "/" + guid
 }
 
-// MetadataPath builds "<scope>/.groundsill/<category>/<name>.json".
+// MetadataPath builds "<scope>/.corestone/<category>/<name>.json".
 func MetadataPath(scope, category, name string) string {
 	p := MetadataDir + "/" + category + "/" + name + ".json"
 	if scope == "" {

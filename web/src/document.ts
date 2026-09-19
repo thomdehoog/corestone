@@ -16,7 +16,7 @@ import "./fields";
 
 const SIDEBARS = [["props", "Properties"], ["entry", "Entry"], ["rel", "Relationships"], ["comments", "Comments"], ["versions", "Versions"]] as const;
 
-@customElement("groundsill-document")
+@customElement("corestone-document")
 export class DocumentView extends LitElement {
   @property() guid = "";
   private unsub?: () => void;
@@ -330,8 +330,8 @@ export class DocumentView extends LitElement {
         return html`<h4>Document properties</h4>
           <dl class="kv"><dt>Type</dt><dd>${v.meta.type}</dd><dt>Folder</dt><dd>${v.meta.folder || "/"}</dd><dt>GUID</dt><dd class="mono small">${v.meta.guid}</dd><dt>Modified</dt><dd>${relTime(v.meta.modifiedAt)}</dd>
             ${Object.entries(v.meta.workflows ?? {}).map(([w, st]) => html`<dt>${w}</dt><dd><span class="pill state">${st}</span></dd>`)}</dl>
-          ${(this.schema?.fields ?? []).filter((f) => f.type !== "workflow").map((f) => html`<groundsill-field .field=${f} .value=${this.fields[f.id]} .attachments=${v.attachments ?? []}
-            @field-change=${(e: CustomEvent) => { const n = { ...this.fields }; if (e.detail.value == null) delete n[e.detail.id]; else n[e.detail.id] = e.detail.value; this.fields = n; }}></groundsill-field>`)}
+          ${(this.schema?.fields ?? []).filter((f) => f.type !== "workflow").map((f) => html`<corestone-field .field=${f} .value=${this.fields[f.id]} .attachments=${v.attachments ?? []}
+            @field-change=${(e: CustomEvent) => { const n = { ...this.fields }; if (e.detail.value == null) delete n[e.detail.id]; else n[e.detail.id] = e.detail.value; this.fields = n; }}></corestone-field>`)}
           <button class="btn sm" style="margin-top:8px" @click=${() => navigate({ guid: this.guid, tab: "general" }, true)}>Open as artifact detail</button>`;
       case "entry": {
         const focusedBlock = this.focused ? this.locate(this.focused)?.list[this.locate(this.focused)!.index] : null;

@@ -9,11 +9,11 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/projection"
-	"github.com/thomdehoog/groundsill/internal/testutil"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/projection"
+	"github.com/thomdehoog/corestone/internal/testutil"
 )
 
 func open(t *testing.T) *Foundation {
@@ -170,7 +170,7 @@ func TestLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if l1.Meta.Folder != "" || !strings.HasPrefix(l1.Meta.Path, ".groundsill/links/") {
+	if l1.Meta.Folder != "" || !strings.HasPrefix(l1.Meta.Path, ".corestone/links/") {
 		t.Fatalf("link stored at %s", l1.Meta.Path)
 	}
 	if _, err := f.CreateLink(ctx, obj(t, `{"type":"verifies","source":"`+tc.Meta.GUID+`","target":"`+r1.Meta.GUID+`"}`)); !errors.Is(err, model.ErrConflict) {
@@ -231,7 +231,7 @@ func TestLifecycle(t *testing.T) {
 	if err := f.PutAttachment(ctx, r1.Meta.GUID, "notes.txt", []byte("hello")); err != nil {
 		t.Fatal(err)
 	}
-	if err := f.PutAttachment(ctx, r1.Meta.GUID, ".groundsill.json", []byte("x")); err == nil {
+	if err := f.PutAttachment(ctx, r1.Meta.GUID, ".corestone.json", []byte("x")); err == nil {
 		t.Fatal("reserved attachment name accepted")
 	}
 	got, _, err := f.Attachment(ctx, r1.Meta.GUID, "notes.txt")
@@ -267,7 +267,7 @@ func TestLifecycle(t *testing.T) {
 		t.Fatal("hid after move")
 	}
 	log, _ := f.History(ctx, r1.Meta.GUID, 0)
-	if len(log) < 5 || !strings.Contains(log[0].Subject, "moved") || log[len(log)-1].Trailers["Groundsill-Op"] != "create" {
+	if len(log) < 5 || !strings.Contains(log[0].Subject, "moved") || log[len(log)-1].Trailers["Corestone-Op"] != "create" {
 		t.Fatalf("history %+v", log)
 	}
 
@@ -351,7 +351,7 @@ func TestFormatFidelityAndDirectPush(t *testing.T) {
 	// A hand-written file: tabs, CRLF, no trailing newline, custom property.
 	raw := "{\r\n\t\"guid\": \"" + g + "\",\r\n\t\"kind\": \"entry\",\r\n\t\"type\": \"requirement\",\r\n\t\"x-tool\": {\"keep\": [1, 2]},\r\n\t\"title\": \"Hand made\",\r\n\t\"fields\": {\r\n\t\t\"priority\": \"low\"\r\n\t}\r\n}"
 	head, _ := f.Repo.Head(ctx)
-	c, err := f.Repo.BuildCommit(ctx, head, "external push", []gitx.Op{{Path: "ext/" + g + "/.groundsill.json", Content: []byte(raw)}})
+	c, err := f.Repo.BuildCommit(ctx, head, "external push", []gitx.Op{{Path: "ext/" + g + "/.corestone.json", Content: []byte(raw)}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -468,7 +468,7 @@ func dsnOf(t *testing.T, f *Foundation) string {
 func testutilBase(t *testing.T) string {
 	dsn := envDSN()
 	if dsn == "" {
-		t.Skip("GROUNDSILL_TEST_DSN not set")
+		t.Skip("CORESTONE_TEST_DSN not set")
 	}
 	return dsn
 }

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/thomdehoog/groundsill/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/ojson"
 )
 
 // FieldType is one of the Foundation's generic field types (design guide §4.6).

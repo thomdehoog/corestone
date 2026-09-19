@@ -11,7 +11,7 @@ import "./folder-field";
 // Modal dialogs: the "+ New" flow (choose a type → empty schema-generated
 // form → create), the artifact picker, and confirmations.
 
-@customElement("groundsill-dialogs")
+@customElement("corestone-dialogs")
 export class Dialogs extends LitElement {
   private unsub?: () => void;
   private s!: State;
@@ -46,7 +46,7 @@ export class Dialogs extends LitElement {
     const p = this.s?.picker;
     let body;
     switch (d?.kind) {
-      case "new": body = html`<groundsill-new-dialog .dialog=${d}></groundsill-new-dialog>`; break;
+      case "new": body = html`<corestone-new-dialog .dialog=${d}></corestone-new-dialog>`; break;
       case "confirm": body = this.confirm(d); break;
       case "prompt": body = this.prompt(d); break;
       default: body = nothing;
@@ -54,7 +54,7 @@ export class Dialogs extends LitElement {
     return html`${d ? html`<div class="backdrop" @click=${(e: Event) => { if (e.target === e.currentTarget) this.dismiss(); }}>
         <div class="dialog ${d.kind === "prompt" ? "prompt" : ""}" role="dialog" aria-modal="true">${body}</div></div>` : nothing}
       ${p ? html`<div class="backdrop picker-layer" @click=${(e: Event) => { if (e.target === e.currentTarget) { const c = p.onCancel as (() => void) | undefined; store.set({ picker: null }); c?.(); } }}>
-        <div class="dialog" role="dialog" aria-modal="true"><groundsill-picker .dialog=${p}></groundsill-picker></div></div>` : nothing}`;
+        <div class="dialog" role="dialog" aria-modal="true"><corestone-picker .dialog=${p}></corestone-picker></div></div>` : nothing}`;
   }
 
   private prompt(d: Dialog) {
@@ -68,7 +68,7 @@ export class Dialogs extends LitElement {
       ${d.text ? html`<p class="hint">${d.text as string}</p>` : nothing}
       <form class="prompt-form" @submit=${submit}>
         ${d.folder
-          ? html`<groundsill-folder-field test="prompt" .value=${(d.value as string) ?? ""} .ignore=${(d.ignore as string) ?? ""}></groundsill-folder-field>`
+          ? html`<corestone-folder-field test="prompt" .value=${(d.value as string) ?? ""} .ignore=${(d.ignore as string) ?? ""}></corestone-folder-field>`
           : html`<input type="text" data-test="prompt" .value=${(d.value as string) ?? ""} placeholder=${(d.placeholder as string) ?? ""} aria-label=${d.title as string}>`}
         <div class="foot"><button type="button" class="btn" @click=${() => this.dismiss()}>Cancel</button>
         <button type="submit" class="btn primary">${(d.confirmLabel as string) ?? "OK"}</button></div>
@@ -83,7 +83,7 @@ export class Dialogs extends LitElement {
   }
 }
 
-@customElement("groundsill-new-dialog")
+@customElement("corestone-new-dialog")
 export class NewDialog extends LitElement {
   dialog!: Dialog;
   @state() private types: Schema[] = [];
@@ -234,7 +234,7 @@ export class NewDialog extends LitElement {
           <div class="field"><label for="new-title">Title<span class="req">*</span></label><div class="value">
             <input id="new-title" type="text" required .value=${this.titleText} @input=${(e: Event) => (this.titleText = (e.target as HTMLInputElement).value)} /></div></div>
           <div class="field"><label for="new-path">Folder</label><div class="value">
-            <groundsill-folder-field inputId="new-path" test="new-path" .value=${this.path} @folder-change=${(e: CustomEvent<string>) => this.onFolder(e.detail)}></groundsill-folder-field>
+            <corestone-folder-field inputId="new-path" test="new-path" .value=${this.path} @folder-change=${(e: CustomEvent<string>) => this.onFolder(e.detail)}></corestone-folder-field>
             ${this.scopeError ? html`<div class="notice error" data-test="scope-notice" role="alert">${this.scopeError}</div>` : nothing}
             <div class="help">Folders organize; identity stays with the GUID. Schemas apply lexically along this path.</div></div></div>
           <div class="field"><label for="new-hid">HID</label><div class="value">
@@ -259,8 +259,8 @@ export class NewDialog extends LitElement {
             <button type="button" class="btn sm" @click=${() => this.pickArtifact("target")}>${this.target ? "Change…" : "Select…"}</button></div></div>
           <div class="field"><label for="new-text">Text<span class="req">*</span></label><div class="value">
             <textarea id="new-text" required .value=${this.text} @input=${(e: Event) => (this.text = (e.target as HTMLTextAreaElement).value)}></textarea></div></div>` : nothing}
-        ${(s.fields ?? []).filter((f) => f.type !== "workflow").map((f) => html`<groundsill-field .field=${f} .value=${this.values[f.id]}
-          @field-change=${(e: CustomEvent) => { this.values = { ...this.values, [e.detail.id]: e.detail.value }; }}></groundsill-field>`)}
+        ${(s.fields ?? []).filter((f) => f.type !== "workflow").map((f) => html`<corestone-field .field=${f} .value=${this.values[f.id]}
+          @field-change=${(e: CustomEvent) => { this.values = { ...this.values, [e.detail.id]: e.detail.value }; }}></corestone-field>`)}
         ${s.workflows?.length ? html`<div class="help" style="margin-top:8px">Workflows ${s.workflows.join(", ")} start in their initial state.</div>` : nothing}
         <div class="foot">
           <button type="button" class="btn" @click=${() => store.set({ dialog: null })}>Cancel</button>
@@ -297,7 +297,7 @@ export class NewDialog extends LitElement {
   }
 }
 
-@customElement("groundsill-picker")
+@customElement("corestone-picker")
 export class Picker extends LitElement {
   dialog!: Dialog;
   @state() private q = "";

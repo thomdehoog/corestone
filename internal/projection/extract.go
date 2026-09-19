@@ -6,9 +6,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/scanner"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/scanner"
 )
 
 const (

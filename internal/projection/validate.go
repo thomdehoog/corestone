@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"sort"
 
-	"github.com/thomdehoog/groundsill/internal/model"
+	"github.com/thomdehoog/corestone/internal/model"
 )
 
 // Issue is one finding of the repository validation service.

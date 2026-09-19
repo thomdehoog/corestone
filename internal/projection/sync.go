@@ -8,9 +8,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/scanner"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/scanner"
 )
 
 // Sync brings the projection to the repository head (design guide §5.13):

@@ -4,7 +4,7 @@ import { test as base, expect, type Page } from "@playwright/test";
 // folder per spec, and a guard that fails any test in which the page
 // threw an uncaught exception.
 
-export const base_url = process.env.GROUNDSILL_URL || "http://127.0.0.1:18090";
+export const base_url = process.env.CORESTONE_URL || "http://127.0.0.1:18090";
 export const api = base_url + "/api";
 
 /** Sends a write, honouring 503 + Retry-After (maintenance mode) like a well-behaved client. */

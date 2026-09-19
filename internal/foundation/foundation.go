@@ -1,4 +1,4 @@
-// Package foundation is the Groundsill Foundation service: it turns logical
+// Package foundation is the Corestone Foundation service: it turns logical
 // repository operations into single Git commits, keeps the PostgreSQL
 // projection synchronized with the §10.1 transaction, and exposes the
 // service APIs (effective schemas, overlays, workflow evaluation,
@@ -15,10 +15,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/projection"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/projection"
 )
 
 // Foundation owns one repository and its projection.

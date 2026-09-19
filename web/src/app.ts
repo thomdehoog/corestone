@@ -17,14 +17,14 @@ import "./toast";
 
 const DEFAULT_SPLIT = 38, MIN_SPLIT = 12, MAX_SPLIT = 85;
 
-@customElement("groundsill-app")
+@customElement("corestone-app")
 export class App extends LitElement {
   private unsub?: () => void;
   private s!: State;
   @state() private selectedKind: string | null = null;
   private lastGuid: string | null = null;
   private statusTimer = 0;
-  @state() private split = Number(localStorage.getItem("groundsill.split")) || DEFAULT_SPLIT; // overview height, % of the main area
+  @state() private split = Number(localStorage.getItem("corestone.split")) || DEFAULT_SPLIT; // overview height, % of the main area
 
   override createRenderRoot() { return this; }
   override connectedCallback() {
@@ -54,7 +54,7 @@ export class App extends LitElement {
   private onKey = (e: KeyboardEvent) => {
     const t = e.target as HTMLElement;
     const typing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
-    if (e.key === "/" && !typing) { e.preventDefault(); this.querySelector<HTMLInputElement>("groundsill-sidebar input[type=search]")?.focus(); }
+    if (e.key === "/" && !typing) { e.preventDefault(); this.querySelector<HTMLInputElement>("corestone-sidebar input[type=search]")?.focus(); }
     if (e.key === "n" && !typing && !this.s.dialog) { e.preventDefault(); store.set({ dialog: { kind: "new", folder: this.s.route.folder } }); }
     if (e.key === "Escape" && !typing && this.s.route.guid && !this.s.dialog) navigate({ guid: null, expanded: false });
   };
@@ -67,7 +67,7 @@ export class App extends LitElement {
 
   private setSplit(pct: number, persist = true) {
     this.split = Math.min(MAX_SPLIT, Math.max(MIN_SPLIT, pct));
-    if (persist) localStorage.setItem("groundsill.split", String(Math.round(this.split)));
+    if (persist) localStorage.setItem("corestone.split", String(Math.round(this.split)));
   }
 
   // The divider between the overview and the selected artifact: drag, arrow
@@ -111,7 +111,7 @@ export class App extends LitElement {
     return html`<div class="shell ${navCollapsed ? "nav-collapsed" : ""}">
       <header class="header">
         <button class="btn sm icon" title="Toggle navigation" aria-label="Toggle navigation" @click=${() => store.toggleNav()}>☰</button>
-        <a class="brand" href="/" @click=${(e: Event) => { e.preventDefault(); navigate({ folder: "", guid: null, q: "", type: "", kind: "" }); }}><span class="logo"></span>Groundsill</a>
+        <a class="brand" href="/" @click=${(e: Event) => { e.preventDefault(); navigate({ folder: "", guid: null, q: "", type: "", kind: "" }); }}><span class="logo"></span>Corestone</a>
         <nav class="crumbs">${folderCrumbs(route.folder).map((c, i) => html`${i ? html`<span>/</span>` : nothing}<a href="#" @click=${(e: Event) => { e.preventDefault(); navigate({ folder: c.path, guid: null, type: "" }); }}>${c.name}</a>`)}</nav>
         <span class="spacer"></span>
         ${p?.maintenance && p.total ? html`<div class="progress" title=${p.phase ?? ""}><div style=${`width:${Math.round((100 * p.progress) / Math.max(1, p.total))}%`}></div></div>` : nothing}
@@ -119,18 +119,18 @@ export class App extends LitElement {
         <button class="btn sm" title="Rebuild projection from Git" @click=${() => api.reindex().then(() => store.toast("Reindex started", "info")).catch((e) => store.toast(e.message, "error"))}>Reindex</button>
         <button class="btn sm" title="Set your name" @click=${this.setName}>${this.s.user || "anonymous"}</button>
       </header>
-      <groundsill-sidebar></groundsill-sidebar>
+      <corestone-sidebar></corestone-sidebar>
       <div class="nav-scrim" @click=${() => store.toggleNav()}></div>
       <div class="main ${mainClass}" style=${`--split:${this.split}%`}>
-        <groundsill-overview></groundsill-overview>
+        <corestone-overview></corestone-overview>
         <div class="splitter" data-test="splitter" role="separator" aria-orientation="horizontal" tabindex="0" title="Drag to resize; double-click to reset"
           aria-valuemin=${MIN_SPLIT} aria-valuemax=${MAX_SPLIT} aria-valuenow=${Math.round(this.split)}
           @pointerdown=${this.dragSplit} @keydown=${this.keySplit} @dblclick=${() => this.setSplit(DEFAULT_SPLIT)}></div>
-        ${route.guid ? (this.selectedKind === "document" ? html`<groundsill-document .guid=${route.guid}></groundsill-document>` : html`<groundsill-detail .guid=${route.guid}></groundsill-detail>`)
+        ${route.guid ? (this.selectedKind === "document" ? html`<corestone-document .guid=${route.guid}></corestone-document>` : html`<corestone-detail .guid=${route.guid}></corestone-detail>`)
           : html`<div class="empty-state" style="display:grid;place-items:center"><div><div class="big">Select an artifact</div>Pick a row above, search with <kbd>/</kbd>, or create one with <kbd>n</kbd>.</div></div>`}
       </div>
     </div>
-    <groundsill-dialogs></groundsill-dialogs>
-    <groundsill-toasts></groundsill-toasts>`;
+    <corestone-dialogs></corestone-dialogs>
+    <corestone-toasts></corestone-toasts>`;
   }
 }

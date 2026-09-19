@@ -7,10 +7,10 @@ import (
 	"log"
 	"sort"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/projection"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/projection"
 )
 
 // Get returns an artifact: projected metadata plus its document from Git.
@@ -337,10 +337,10 @@ func (f *Foundation) History(ctx context.Context, guid string, limit int) ([]git
 	specs := []string{
 		":(glob)**/" + guid + "/**",
 		":(glob)" + guid + "/**",
-		":(glob)**/.groundsill/links/" + guid + ".json",
-		":(glob)**/.groundsill/comments/" + guid + ".json",
-		":(glob).groundsill/links/" + guid + ".json",
-		":(glob).groundsill/comments/" + guid + ".json",
+		":(glob)**/.corestone/links/" + guid + ".json",
+		":(glob)**/.corestone/comments/" + guid + ".json",
+		":(glob).corestone/links/" + guid + ".json",
+		":(glob).corestone/comments/" + guid + ".json",
 	}
 	log, err := f.Repo.Log(ctx, head, specs, limit)
 	if err != nil {

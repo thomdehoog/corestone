@@ -62,7 +62,7 @@ class Store {
     status: null,
     connected: false,
     session: "",
-    user: localStorage.getItem("groundsill.user") || "",
+    user: localStorage.getItem("corestone.user") || "",
     selection: null,
     selectionError: null,
     loading: false,
@@ -71,7 +71,7 @@ class Store {
     dialog: null,
     picker: null,
     refreshTick: 0,
-    navCollapsed: (localStorage.getItem("groundsill.nav") ?? (narrowScreen() ? "collapsed" : "open")) === "collapsed",
+    navCollapsed: (localStorage.getItem("corestone.nav") ?? (narrowScreen() ? "collapsed" : "open")) === "collapsed",
   };
   private listeners = new Set<Listener>();
   private toastSeq = 0;
@@ -113,13 +113,13 @@ class Store {
   }
 
   setUser(name: string) {
-    localStorage.setItem("groundsill.user", name);
+    localStorage.setItem("corestone.user", name);
     this.set({ user: name });
   }
 
   toggleNav() {
     const c = !this.state.navCollapsed;
-    localStorage.setItem("groundsill.nav", c ? "collapsed" : "open");
+    localStorage.setItem("corestone.nav", c ? "collapsed" : "open");
     this.set({ navCollapsed: c });
   }
 

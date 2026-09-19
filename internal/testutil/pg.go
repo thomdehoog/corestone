@@ -16,12 +16,12 @@ import (
 var seq atomic.Int64
 
 // DSN returns a connection string to a throwaway PostgreSQL schema, or
-// skips the test when GROUNDSILL_TEST_DSN is not set.
+// skips the test when CORESTONE_TEST_DSN is not set.
 func DSN(t testing.TB) string {
 	t.Helper()
-	dsn := os.Getenv("GROUNDSILL_TEST_DSN")
+	dsn := os.Getenv("CORESTONE_TEST_DSN")
 	if dsn == "" {
-		t.Skip("GROUNDSILL_TEST_DSN not set; skipping PostgreSQL-backed test")
+		t.Skip("CORESTONE_TEST_DSN not set; skipping PostgreSQL-backed test")
 	}
 	name := fmt.Sprintf("t_%d_%d_%d", time.Now().UnixNano(), os.Getpid(), seq.Add(1))
 	admin, err := sql.Open("postgres", dsn)

@@ -1,6 +1,6 @@
 # Roadmap: what is still missing, and how to build it
 
-An honest assessment of the gaps in Groundsill as of the production pass, ranked by how much each
+An honest assessment of the gaps in Corestone as of the production pass, ranked by how much each
 one would block a real deployment, with a concrete plan for each. Plans name the packages that
 exist today (`internal/gitx`, `internal/projection`, `internal/foundation`, `internal/httpapi`,
 `web/`) so that each one can be started without a design phase. Effort is a working estimate for
@@ -37,7 +37,7 @@ author is whatever name the browser sends.
 - **The identity reaches Git.** The Foundation sets the author name and email of every commit
   from the verified principal and refuses a client-supplied author; the presence hub uses the same
   name. That is what turns the history into an audit trail.
-- **Authorization as configuration.** An `access.json` in a folder's `.groundsill` directory,
+- **Authorization as configuration.** An `access.json` in a folder's `.corestone` directory,
   inherited down the tree with nearest-wins exactly like schemas and workflows. Four roles:
   reader (artifacts and history), editor (create, update, transition, comment, attach),
   maintainer (schemas, workflows, folder moves, deletes) and admin (reindex, relocate metadata,
@@ -58,7 +58,7 @@ author is whatever name the browser sends.
    three authenticators (`none`, `proxy`, `oidc`) behind one interface. Session cookies sealed with
    a key from `-session-key` (or generated and persisted in `repo_state` on first start).
 2. `internal/foundation`: every operation takes the principal from the context; `write()` builds
-   the commit author from it and rejects any author field in request bodies. The `Groundsill-Actor`
+   the commit author from it and rejects any author field in request bodies. The `Corestone-Actor`
    trailer records the subject for audit queries.
 3. `internal/httpapi`: an authentication middleware, `GET /api/me`, `POST /api/logout`, the OIDC
    callback route, the CSRF header check on non-GET requests, and token management routes.
@@ -131,7 +131,7 @@ developers, a wall for everyone else.
    are added by clicking, with the initial state and transition names in a side panel.
 4. Impact panel: before saving, the preview endpoint runs and the editor lists what would break,
    with a link to each artifact. Saving with impact requires an explicit confirmation.
-5. Scope chooser: the editor shows where the file lives (which folder's `.groundsill`) and which
+5. Scope chooser: the editor shows where the file lives (which folder's `.corestone`) and which
    folders inherit it, using the existing types endpoint.
 6. Tests: Foundation tests for both preview endpoints; browser tests that create a type from
    scratch, add an enum field, see the impact of removing a required field, and edit a workflow
@@ -156,7 +156,7 @@ client delays another client's single save by seconds.
    validation failure aborts with the index of the failing operation. The response carries the
    per-operation result (GUID, ETag) in order. Operations in one batch may reference each other
    by index (`"$0"`), so a batch can create an entry and link it in one commit.
-2. Commit message: the subject summarizes counts per operation, and one `Groundsill-Op` trailer
+2. Commit message: the subject summarizes counts per operation, and one `Corestone-Op` trailer
    per operation keeps the history greppable, exactly as single operations do today.
 3. The seed script, the end-to-end script and the browser tests' fixtures use the batch endpoint,
    which also makes the suites faster.
@@ -204,7 +204,7 @@ minutes, and writes are refused meanwhile.
    `size`), so standard `git lfs` clients read a mirror correctly and nothing custom is invented.
 3. The scanner classifies pointer files as attachments; `GET /files/{name}` streams from the store
    with the existing ETag and sandbox headers; deletion removes the pointer and leaves the blob to
-   a garbage-collection command (`groundsilld gc-blobs`) that walks the head tree and history.
+   a garbage-collection command (`corestone gc-blobs`) that walks the head tree and history.
 4. Tests: round trip through both stores, a pointer read by the `git lfs` command line in the
    end-to-end script, and the garbage collector on a repository with a deleted attachment.
 
@@ -216,7 +216,7 @@ minutes, and writes are refused meanwhile.
 
 **Plan.**
 
-1. PostgreSQL `LISTEN/NOTIFY` on a `groundsill_events` channel: every hub publishes its presence
+1. PostgreSQL `LISTEN/NOTIFY` on a `corestone_events` channel: every hub publishes its presence
    changes and the Foundation's commit and status events with a process id; every hub subscribes
    (one dedicated connection per process, reconnecting with backoff) and rebroadcasts to its own
    clients. Payloads above the 8 KB notify limit fall back to a `hub_events` table row plus a
@@ -325,7 +325,7 @@ minutes, and writes are refused meanwhile.
 
 **Plan.**
 
-1. Shared saved views as configuration: `.groundsill/views/<id>.json` with folder, subtree,
+1. Shared saved views as configuration: `.corestone/views/<id>.json` with folder, subtree,
    kind, type, query, field filters, sort and columns, inherited like schemas and listed in the
    sidebar under "Views". Personal views live in a `user_prefs` table in PostgreSQL, since they
    are not part of the repository's content.

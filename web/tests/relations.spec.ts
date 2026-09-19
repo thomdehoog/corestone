@@ -45,14 +45,14 @@ test("relationships: typed links both ways, removal, free-form type, and endpoin
   // a requirement can only be the target of "verifies": the button is offered as incoming
   await expect(rel.locator(".actions button", { hasText: "verifies" })).toContainText("←");
   await rel.locator(".actions button", { hasText: "verifies" }).click();
-  await page.locator("groundsill-picker input").fill(`Test A ${id}`);
+  await page.locator("corestone-picker input").fill(`Test A ${id}`);
   await page.locator(".picker-results .row", { hasText: `Test A ${id}` }).click();
   await expect(rel.locator(".link-row")).toHaveCount(1);
   await expect(rel.locator(".link-row .arrow")).toHaveText("←");
   // free-form "related" link via the prompt
   await rel.locator(".actions button", { hasText: "other" }).click();
   await answerPrompt(page, "related");
-  await page.locator("groundsill-picker input").fill(`Req B ${id}`);
+  await page.locator("corestone-picker input").fill(`Req B ${id}`);
   await page.locator(".picker-results .row", { hasText: `Req B ${id}` }).click();
   await expect(rel.locator(".link-row")).toHaveCount(2);
   await expect(rel.locator(".link-row", { hasText: "related" }).locator(".arrow")).toHaveText("→");
@@ -68,9 +68,9 @@ test("relationships: typed links both ways, removal, free-form type, and endpoin
   await page.goto(`/artifact/${t1.meta.guid}`);
   await page.locator("#sec-relationships .actions button", { hasText: "other" }).click();
   await answerPrompt(page, "verifies");
-  await page.locator("groundsill-picker input").fill(`Test A ${id}`); // a test case as target of verifies is not allowed
+  await page.locator("corestone-picker input").fill(`Test A ${id}`); // a test case as target of verifies is not allowed
   await expect(page.locator(".picker-results")).toContainText("No matching"); // itself is excluded
-  await page.locator("groundsill-picker input").fill(`Req A ${id}`);
+  await page.locator("corestone-picker input").fill(`Req A ${id}`);
   await page.locator(".picker-results .row", { hasText: `Req A ${id}` }).click();
   await expect(page.locator(".toast.error")).toContainText("already exists"); // duplicate of the first link
 });
@@ -101,7 +101,7 @@ test("overlays: three levels, per-field origin, override and revert", async ({ p
   await expect(ov).toContainText("effort: 5");
   // the base lists its variants; navigating the chain works
   await ov.locator(".chain .node a").first().click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Base ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Base ${id}`);
   await expect(page.locator("#sec-overlay")).toContainText("Variants deriving");
   await expect(page.locator("#sec-overlay a", { hasText: `Mid ${id}` })).toBeVisible();
 });
@@ -155,7 +155,7 @@ test("delete asks for confirmation and can be cancelled", async ({ page }) => {
   await expect(page.locator(".dialog")).toContainText("Delete");
   await page.locator(".dialog button", { hasText: "Cancel" }).click();
   await expect(page.locator(".dialog")).toHaveCount(0);
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Keep me ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Keep me ${id}`);
   await page.locator("[data-test=delete]").click();
   await page.keyboard.press("Escape");
   await expect(page.locator(".dialog")).toHaveCount(0);

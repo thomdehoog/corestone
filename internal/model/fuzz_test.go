@@ -10,7 +10,7 @@ func FuzzCleanFolder(f *testing.F) {
 	f.Add("a/b")
 	f.Add(":x")
 	f.Add("../x")
-	f.Add("a/.groundsill/b")
+	f.Add("a/.corestone/b")
 	f.Fuzz(func(t *testing.T, p string) {
 		out, err := CleanFolder(p)
 		if err != nil {

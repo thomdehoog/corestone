@@ -1,4 +1,4 @@
-// Package httpapi is the REST layer of Groundsill (design guide
+// Package httpapi is the REST layer of Corestone (design guide
 // §6): artifact APIs (CRUD for entries, documents, links, comments) and
 // service APIs (search, tree, effective schemas, overlay analysis, workflow
 // evaluation, relationship analysis, history, validation, reindex). It is
@@ -18,11 +18,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/thomdehoog/groundsill/internal/foundation"
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/projection"
+	"github.com/thomdehoog/corestone/internal/foundation"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/projection"
 )
 
 const (
@@ -48,7 +48,7 @@ func New(f *foundation.Foundation) *Server {
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// The client names its user (percent-encoded) so commits carry them as author.
-	if user, err := url.PathUnescape(r.Header.Get("X-Groundsill-User")); err == nil && user != "" {
+	if user, err := url.PathUnescape(r.Header.Get("X-Corestone-User")); err == nil && user != "" {
 		r = r.WithContext(gitx.WithAuthor(r.Context(), user))
 	}
 	s.mux.ServeHTTP(w, r)

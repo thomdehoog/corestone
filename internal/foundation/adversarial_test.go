@@ -8,9 +8,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/projection"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/projection"
 )
 
 // Adversarial suite: hostile inputs, races between validations, and
@@ -23,7 +23,7 @@ func TestHostileInputsAreRejectedCleanly(t *testing.T) {
 	deep := strings.Repeat("[", 20000) + strings.Repeat("]", 20000)
 	cases := []string{
 		`{"path":"a/../b","type":"requirement","title":"x","fields":{"priority":"low"}}`,
-		`{"path":"a/.groundsill","type":"requirement","title":"x","fields":{"priority":"low"}}`,
+		`{"path":"a/.corestone","type":"requirement","title":"x","fields":{"priority":"low"}}`,
 		`{"path":"` + model.NewGUID() + `","type":"requirement","title":"x","fields":{"priority":"low"}}`,
 		`{"path":":!magic","type":"requirement","title":"x","fields":{"priority":"low"}}`,
 		`{"path":"a\u0000b","type":"requirement","title":"x","fields":{"priority":"low"}}`,
@@ -65,7 +65,7 @@ func TestHostileInputsAreRejectedCleanly(t *testing.T) {
 	}
 	// Attachment names cannot escape the GUID directory.
 	r := create(t, f, model.KindEntry, `{"path":"a","type":"requirement","title":"ok","fields":{"priority":"low"}}`)
-	for _, name := range []string{"../x", "..", "a/b", `a\b`, ".groundsill.json", ".groundsill", "", strings.Repeat("n", 300), "x\x00y", ":x"} {
+	for _, name := range []string{"../x", "..", "a/b", `a\b`, ".corestone.json", ".corestone", "", strings.Repeat("n", 300), "x\x00y", ":x"} {
 		if err := f.PutAttachment(ctx, r.Meta.GUID, name, []byte("x")); err == nil {
 			t.Errorf("attachment name %q accepted", name)
 		}
@@ -239,19 +239,19 @@ func TestHostileRepositoryContent(t *testing.T) {
 	g2, g3 := model.NewGUID(), model.NewGUID()
 	head := mustHead(t, f)
 	c, err := f.Repo.BuildCommit(ctx, head, "hostile push", []gitx.Op{
-		{Path: "bad/" + g2 + "/.groundsill.json", Content: []byte("{not json")},
-		{Path: "bad/" + g3 + "/.groundsill.json", Content: []byte(`{"guid":"` + ok.Meta.GUID + `","kind":"entry","type":"requirement","title":"GUID thief"}`)}, // claims an existing GUID
-		{Path: "bad/" + model.NewGUID() + "/.groundsill.json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"link","type":"x","source":"` + ok.Meta.GUID + `","target":"` + ok.Meta.GUID + `"}`)},
-		{Path: "bad/.groundsill/links/not-a-guid.json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"link","type":"related","source":"` + ok.Meta.GUID + `","target":"` + model.NewGUID() + `"}`)},
-		{Path: "bad/.groundsill/comments/" + model.NewGUID() + ".json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"comment","subject":"` + model.NewGUID() + `","text":"orphan"}`)},
-		{Path: "bad/.groundsill/schemas/requirement.json", Content: []byte(`{"type":"other"}`)},
-		{Path: "bad/.groundsill/workflows/dev.json", Content: []byte(`{"id":"dev","states":[]}`)},
-		{Path: ".groundsill/scanner.json", Content: []byte(`{"guid_files":["a/b"]}`)},
-		{Path: "huge/" + model.NewGUID() + "/.groundsill.json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"entry","type":"t","title":"` + strings.Repeat("x", 2<<20) + `"}`)},
-		{Path: "bin/" + model.NewGUID() + "/.groundsill.json", Content: []byte("\x00\x01\x02\xff\xfe")},
-		{Path: "cycle/" + model.NewGUID() + "/.groundsill.json", Content: []byte(`{"guid":"11111111-1111-4111-8111-111111111111","kind":"entry","type":"requirement","title":"c1","base":"22222222-2222-4222-8222-222222222222"}`)},
-		{Path: "cycle/" + model.NewGUID() + "/.groundsill.json", Content: []byte(`{"guid":"22222222-2222-4222-8222-222222222222","kind":"entry","type":"requirement","title":"c2","base":"11111111-1111-4111-8111-111111111111"}`)},
-		{Path: "dup/" + model.NewGUID() + "/.groundsill.json", Content: []byte(`{"guid":"33333333-3333-4333-8333-333333333333","kind":"entry","type":"requirement","title":"dup a","hid":"REQ-1"}`)},
+		{Path: "bad/" + g2 + "/.corestone.json", Content: []byte("{not json")},
+		{Path: "bad/" + g3 + "/.corestone.json", Content: []byte(`{"guid":"` + ok.Meta.GUID + `","kind":"entry","type":"requirement","title":"GUID thief"}`)}, // claims an existing GUID
+		{Path: "bad/" + model.NewGUID() + "/.corestone.json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"link","type":"x","source":"` + ok.Meta.GUID + `","target":"` + ok.Meta.GUID + `"}`)},
+		{Path: "bad/.corestone/links/not-a-guid.json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"link","type":"related","source":"` + ok.Meta.GUID + `","target":"` + model.NewGUID() + `"}`)},
+		{Path: "bad/.corestone/comments/" + model.NewGUID() + ".json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"comment","subject":"` + model.NewGUID() + `","text":"orphan"}`)},
+		{Path: "bad/.corestone/schemas/requirement.json", Content: []byte(`{"type":"other"}`)},
+		{Path: "bad/.corestone/workflows/dev.json", Content: []byte(`{"id":"dev","states":[]}`)},
+		{Path: ".corestone/scanner.json", Content: []byte(`{"guid_files":["a/b"]}`)},
+		{Path: "huge/" + model.NewGUID() + "/.corestone.json", Content: []byte(`{"guid":"` + model.NewGUID() + `","kind":"entry","type":"t","title":"` + strings.Repeat("x", 2<<20) + `"}`)},
+		{Path: "bin/" + model.NewGUID() + "/.corestone.json", Content: []byte("\x00\x01\x02\xff\xfe")},
+		{Path: "cycle/" + model.NewGUID() + "/.corestone.json", Content: []byte(`{"guid":"11111111-1111-4111-8111-111111111111","kind":"entry","type":"requirement","title":"c1","base":"22222222-2222-4222-8222-222222222222"}`)},
+		{Path: "cycle/" + model.NewGUID() + "/.corestone.json", Content: []byte(`{"guid":"22222222-2222-4222-8222-222222222222","kind":"entry","type":"requirement","title":"c2","base":"11111111-1111-4111-8111-111111111111"}`)},
+		{Path: "dup/" + model.NewGUID() + "/.corestone.json", Content: []byte(`{"guid":"33333333-3333-4333-8333-333333333333","kind":"entry","type":"requirement","title":"dup a","hid":"REQ-1"}`)},
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/thomdehoog/groundsill/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/ojson"
 )
 
 func TestGUID(t *testing.T) {
@@ -30,7 +30,7 @@ func TestCleanFolder(t *testing.T) {
 			t.Errorf("CleanFolder(%q)=%q,%v want %q", in, got, err, want)
 		}
 	}
-	bad := []string{"..", "a/../b", ".groundsill", "a/.groundsill/b", NewGUID(), "a/" + NewGUID(), ":magic", "a\x00b", "a\nb", "a/ x", strings.Repeat("a/", 40)}
+	bad := []string{"..", "a/../b", ".corestone", "a/.corestone/b", NewGUID(), "a/" + NewGUID(), ":magic", "a\x00b", "a\nb", "a/ x", strings.Repeat("a/", 40)}
 	for _, in := range bad {
 		if _, err := CleanFolder(in); err == nil {
 			t.Errorf("CleanFolder(%q) accepted", in)
@@ -45,7 +45,7 @@ func TestCleanFolder(t *testing.T) {
 	if !IsWithin("a/b", "a") || IsWithin("ab", "a") || !IsWithin("x", "") {
 		t.Fatal("IsWithin")
 	}
-	if MetadataPath("", "links", "g") != ".groundsill/links/g.json" || MetadataPath("a", "schemas", "t") != "a/.groundsill/schemas/t.json" {
+	if MetadataPath("", "links", "g") != ".corestone/links/g.json" || MetadataPath("a", "schemas", "t") != "a/.corestone/schemas/t.json" {
 		t.Fatal("MetadataPath")
 	}
 }

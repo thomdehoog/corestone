@@ -4,7 +4,7 @@ A guided tour of the repository: what each package does and how a request flows 
 Layers only depend downward.
 
 ```
-cmd/groundsilld              wiring: flags, HTTP server, response headers, access log, graceful shutdown
+cmd/corestone              wiring: flags, HTTP server, response headers, access log, graceful shutdown
   └─ internal/httpapi      REST + WebSocket: decoding, ETag/If-Match, status codes, presence hub
        └─ internal/foundation   the service: operations, the §10.1 transaction, service views
             ├─ internal/projection   PostgreSQL projection (sync, replay, reindex, queries, validation)
@@ -43,7 +43,7 @@ Fuzzed for the fixed-point property.
 ## internal/model — the domain vocabulary
 
 - `identity.go` — kinds, GUID generation/validation, HID and type-id rules.
-- `folder.go` — `CleanFolder`, the single gate for user-supplied folder paths (traversal, `.groundsill`,
+- `folder.go` — `CleanFolder`, the single gate for user-supplied folder paths (traversal, `.corestone`,
   GUID-shaped segments, control characters, pathspec magic, depth/length limits), plus lineage
   helpers.
 - `fields.go` — the field types of design guide §4.6 and value validation.

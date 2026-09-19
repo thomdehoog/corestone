@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Seeds a running groundsilld with a small requirements-management domain:
+# Seeds a running corestone with a small requirements-management domain:
 # workflows, schemas (entries, a document type, link types), entries with
 # overlays, a document composed of entry references, links and comments.
 #

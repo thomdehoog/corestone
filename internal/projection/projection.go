@@ -17,9 +17,9 @@ import (
 
 	"github.com/lib/pq" // PostgreSQL driver
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/scanner"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/scanner"
 )
 
 // DB is a projection bound to one Git repository and one database.

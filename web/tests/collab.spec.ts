@@ -16,8 +16,8 @@ test("presence: editing badge appears for the other user and clears on save", as
   const c2 = await browser.newContext();
   const alice = await c1.newPage();
   const bob = await c2.newPage();
-  await alice.addInitScript(() => localStorage.setItem("groundsill.user", "alice"));
-  await bob.addInitScript(() => localStorage.setItem("groundsill.user", "bob"));
+  await alice.addInitScript(() => localStorage.setItem("corestone.user", "alice"));
+  await bob.addInitScript(() => localStorage.setItem("corestone.user", "bob"));
   await alice.goto(`/artifact/${e.meta.guid}`);
   await bob.goto(`/artifact/${e.meta.guid}`);
   await expect(alice.locator("header [data-test=session].ok")).toBeVisible(); // session connected
@@ -28,7 +28,7 @@ test("presence: editing badge appears for the other user and clears on save", as
   await expect(bob.locator(".toast.success", { hasText: "Saved" })).toBeVisible();
   await expect(alice.locator(".detail-head .presence")).toHaveCount(0);
   // alice's view refreshed with bob's change without reloading
-  await expect(alice.locator("groundsill-detail h2")).toHaveText("bob is typing");
+  await expect(alice.locator("corestone-detail h2")).toHaveText("bob is typing");
   await c1.close();
   await c2.close();
 });
@@ -40,7 +40,7 @@ test("live updates: creations, transitions and deletions show up in the other se
   const b = await c2.newPage();
   await a.goto(`/folder/${folder}/live`);
   await b.goto(`/folder/${folder}/live`);
-  await expect(a.locator("groundsill-overview .empty-state")).toBeVisible();
+  await expect(a.locator("corestone-overview .empty-state")).toBeVisible();
   // b creates through the UI; a sees the row appear
   await b.locator("[data-test=new]").click();
   await b.locator("[data-test=new-entry]").click();
@@ -54,10 +54,10 @@ test("live updates: creations, transitions and deletions show up in the other se
   await expect(a.locator("table.grid tbody tr", { hasText: `Live ${id}` }).locator(".pill.state").first()).toHaveText("review");
   // a opens it, b deletes it: a lands on "not available"
   await a.locator("table.grid tbody tr", { hasText: `Live ${id}` }).click();
-  await expect(a.locator("groundsill-detail h2")).toHaveText(`Live ${id}`);
+  await expect(a.locator("corestone-detail h2")).toHaveText(`Live ${id}`);
   await b.locator("[data-test=delete]").click();
   await b.locator(".dialog .btn.danger").click();
-  await expect(a.locator("groundsill-detail .empty-state, groundsill-detail .notice.error").first()).toBeVisible();
+  await expect(a.locator("corestone-detail .empty-state, corestone-detail .notice.error").first()).toBeVisible();
   await expect(a.locator("table.grid tbody tr", { hasText: `Live ${id}` })).toHaveCount(0);
   await c1.close();
   await c2.close();

@@ -24,7 +24,7 @@ function nearMiss(a: string, b: string): boolean {
   return rest(a, i + 1) === rest(b, i + 1) || rest(a, i) === rest(b, i + 1) || rest(a, i + 1) === rest(b, i);
 }
 
-@customElement("groundsill-folder-field")
+@customElement("corestone-folder-field")
 export class FolderField extends LitElement {
   @property() value = "";
   @property() inputId = "";

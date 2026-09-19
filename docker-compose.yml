@@ -1,36 +1,36 @@
-# Local or single-host deployment: PostgreSQL plus the Groundsill server.
+# Local or single-host deployment: PostgreSQL plus the Corestone server.
 #
 #   docker compose up --build
 #   open http://127.0.0.1:8080
 #
-# Change POSTGRES_PASSWORD (and the matching GROUNDSILL_DB) before exposing
+# Change POSTGRES_PASSWORD (and the matching CORESTONE_DB) before exposing
 # this beyond localhost, and put TLS and authentication in front of port 8080.
 services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: groundsill
-      POSTGRES_PASSWORD: groundsill
-      POSTGRES_DB: groundsill
+      POSTGRES_USER: corestone
+      POSTGRES_PASSWORD: corestone
+      POSTGRES_DB: corestone
     volumes:
       - db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U groundsill -d groundsill"]
+      test: ["CMD-SHELL", "pg_isready -U corestone -d corestone"]
       interval: 5s
       timeout: 5s
       retries: 10
 
-  groundsill:
+  corestone:
     build:
       context: .
       args:
-        VERSION: ${GROUNDSILL_VERSION:-dev}
+        VERSION: ${CORESTONE_VERSION:-dev}
     depends_on:
       db:
         condition: service_healthy
     environment:
-      GROUNDSILL_DB: postgres://groundsill:groundsill@db:5432/groundsill?sslmode=disable
-      GROUNDSILL_ACCESS_LOG: "1"
+      CORESTONE_DB: postgres://corestone:corestone@db:5432/corestone?sslmode=disable
+      CORESTONE_ACCESS_LOG: "1"
     ports:
       - "127.0.0.1:8080:8080"
     volumes:

@@ -1,12 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Browser tests of the generic client against a live groundsilld. They exercise
+// Browser tests of the generic client against a live corestone. They exercise
 // the MVP success criteria (design guide §9.9) through the UI only: define
 // types (via the API, as an application would), create and edit entries,
 // compose documents from entries, navigate relationships, create overlays,
 // drive workflows, and share deep links.
 
-const base = process.env.GROUNDSILL_URL || "http://127.0.0.1:18090";
+const base = process.env.CORESTONE_URL || "http://127.0.0.1:18090";
 const api = base + "/api";
 const stamp = Date.now().toString(36);
 const folder = `ui-${stamp}`;
@@ -63,8 +63,8 @@ test("create an entry through the + button with a schema-generated form", async 
   await page.locator("[data-test=create]").click();
   // created: dialog closes, the detail opens, the row is in the table with its generated HID
   await expect(page.locator(".dialog")).toHaveCount(0);
-  await expect(page.locator("groundsill-detail h2")).toHaveText("Boot fast");
-  await expect(page.locator("groundsill-detail .detail-head .hid")).toContainText("UR");
+  await expect(page.locator("corestone-detail h2")).toHaveText("Boot fast");
+  await expect(page.locator("corestone-detail .detail-head .hid")).toContainText("UR");
   await expect(page.locator("table.grid tbody tr", { hasText: "Boot fast" })).toHaveCount(1);
   await expect(page).toHaveURL(/\/artifact\/[0-9a-f-]{36}/);
 });
@@ -72,14 +72,14 @@ test("create an entry through the + button with a schema-generated form", async 
 test("edit fields, save with optimistic concurrency, and see history", async ({ page }) => {
   const e = await post("/entries", { path: folder, type: "req", title: "Editable", fields: { priority: "low" } });
   await page.goto(`/artifact/${e.meta.guid}`);
-  await expect(page.locator("groundsill-detail h2")).toHaveText("Editable");
+  await expect(page.locator("corestone-detail h2")).toHaveText("Editable");
   await page.locator("[data-test=title]").fill("Editable (v2)");
   await page.locator("[data-field=effort] input").fill("3");
   await expect(page.locator(".savebar .dirty")).toBeVisible();
   await page.locator("[data-test=save]").click();
   await expect(page.locator(".toast.success")).toContainText("Saved");
   await expect(page.locator(".savebar")).toHaveCount(0);
-  await expect(page.locator("groundsill-detail h2")).toHaveText("Editable (v2)");
+  await expect(page.locator("corestone-detail h2")).toHaveText("Editable (v2)");
   // while a draft is being edited, a concurrent change elsewhere is announced,
   // and saving is rejected (412) without losing the draft
   await page.locator("[data-test=title]").fill("my version");
@@ -116,14 +116,14 @@ test("relationships: link two artifacts and navigate between them", async ({ pag
   const t = await post("/entries", { path: folder, type: "tc", title: `Linked test ${stamp}` });
   await page.goto(`/artifact/${t.meta.guid}`);
   await page.locator("#sec-relationships .actions button", { hasText: "verifies" }).click();
-  await page.locator("groundsill-picker input").fill(`Linked requirement ${stamp}`);
+  await page.locator("corestone-picker input").fill(`Linked requirement ${stamp}`);
   await page.locator(".picker-results .row", { hasText: `Linked requirement ${stamp}` }).click();
   await expect(page.locator(".toast.success")).toContainText("Link created");
   const row = page.locator("#sec-relationships .link-row");
   await expect(row).toHaveCount(1);
   await expect(row).toContainText("verifies");
   await row.locator("a").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Linked requirement ${stamp}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Linked requirement ${stamp}`);
   await expect(page.locator("#sec-relationships .link-row")).toContainText(`Linked test ${stamp}`);
   void r;
 });
@@ -150,7 +150,7 @@ test("overlays: create a variant and see inherited fields", async ({ page }) => 
   await page.locator("#new-title").fill("Variant A");
   await page.locator(".dialog [data-field=priority] select").selectOption("low");
   await page.locator("[data-test=create]").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText("Variant A");
+  await expect(page.locator("corestone-detail h2")).toHaveText("Variant A");
   await expect(page.locator("#sec-overlay .chain .node")).toHaveCount(2);
   await expect(page.locator("[data-field=rationale] .inherited")).toContainText("inherited");
   await expect(page.locator("[data-field=rationale] textarea")).toHaveValue("");
@@ -169,7 +169,7 @@ test("documents: compose from entries and edit in the block editor", async ({ pa
   await page.locator(".doc-toolbar button", { hasText: "Section" }).click();
   await page.locator('.block-wrap[data-type=section] .block[contenteditable]').first().fill("Timing");
   await page.locator("[data-test=insert-entry]").click();
-  await page.locator("groundsill-picker input").fill(`Referenced in doc ${stamp}`);
+  await page.locator("corestone-picker input").fill(`Referenced in doc ${stamp}`);
   await page.locator(".picker-results .row", { hasText: `Referenced in doc ${stamp}` }).click();
   await expect(page.locator(`.entry-card[data-entry="${r.meta.guid}"]`)).toContainText(`Referenced in doc ${stamp}`);
   await page.locator("[data-test=save]").click();
@@ -184,7 +184,7 @@ test("documents: compose from entries and edit in the block editor", async ({ pa
   await expect(page.locator(".doc-side")).toContainText("Document properties");
   // clicking the entry card opens the entry
   await page.locator(".entry-card").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Referenced in doc ${stamp}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Referenced in doc ${stamp}`);
 });
 
 test("search, filters, subtree toggle and deep links", async ({ page }) => {

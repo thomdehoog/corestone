@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/thomdehoog/groundsill/internal/gitx"
-	"github.com/thomdehoog/groundsill/internal/model"
-	"github.com/thomdehoog/groundsill/internal/ojson"
-	"github.com/thomdehoog/groundsill/internal/scanner"
+	"github.com/thomdehoog/corestone/internal/gitx"
+	"github.com/thomdehoog/corestone/internal/model"
+	"github.com/thomdehoog/corestone/internal/ojson"
+	"github.com/thomdehoog/corestone/internal/scanner"
 )
 
 // CreateLink creates a directed typed relationship. Request properties:
@@ -89,9 +89,9 @@ func (f *Foundation) CreateLink(ctx context.Context, req *ojson.Object) (*View, 
 			tgtL = label(s.Artifact)
 		}
 		cs := &changeset{subject: fmt.Sprintf("Link %s from %s to %s created", typ, srcL, tgtL)}
-		cs.trailer("Groundsill-Op", "create")
-		cs.trailer("Groundsill-Guid", guid)
-		cs.trailer("Groundsill-Kind", "link")
+		cs.trailer("Corestone-Op", "create")
+		cs.trailer("Corestone-Guid", guid)
+		cs.trailer("Corestone-Kind", "link")
 		cs.ops = []gitx.Op{{Path: path, Content: content}}
 		cs.event = Event{Op: "create", GUID: guid, Kind: "link", Subject: src}
 		cs.result = &View{Meta: summarize(a, scope, path, gitx.BlobSHA(content)), Data: doc, ETag: gitx.BlobSHA(content)}
@@ -228,9 +228,9 @@ func (f *Foundation) CreateComment(ctx context.Context, req *ojson.Object) (*Vie
 			subjL = label(s.Artifact)
 		}
 		cs := &changeset{subject: fmt.Sprintf("Comment added to %s", subjL)}
-		cs.trailer("Groundsill-Op", "create")
-		cs.trailer("Groundsill-Guid", guid)
-		cs.trailer("Groundsill-Kind", "comment")
+		cs.trailer("Corestone-Op", "create")
+		cs.trailer("Corestone-Guid", guid)
+		cs.trailer("Corestone-Kind", "comment")
 		cs.ops = []gitx.Op{{Path: path, Content: content}}
 		cs.event = Event{Op: "create", GUID: guid, Kind: "comment", Subject: subject}
 		cs.result = &View{Meta: summarize(a, scope, path, gitx.BlobSHA(content)), Data: doc, ETag: gitx.BlobSHA(content)}
@@ -287,9 +287,9 @@ func (f *Foundation) Transition(ctx context.Context, guid, workflow, to, ifMatch
 			return &changeset{result: view}, nil
 		}
 		cs := &changeset{subject: fmt.Sprintf("Workflow %s: %s transitioned from %s to %s", workflow, label(cur.Artifact), from, tr.To)}
-		cs.trailer("Groundsill-Op", "transition")
-		cs.trailer("Groundsill-Guid", guid)
-		cs.trailer("Groundsill-Workflow", workflow)
+		cs.trailer("Corestone-Op", "transition")
+		cs.trailer("Corestone-Guid", guid)
+		cs.trailer("Corestone-Workflow", workflow)
 		cs.ops = []gitx.Op{{Path: cur.Loc.FilePath, Content: content}}
 		cs.event = Event{Op: "transition", GUID: guid, Kind: string(cur.Kind)}
 		cs.result = view

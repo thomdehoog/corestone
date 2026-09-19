@@ -64,16 +64,16 @@ test("all field types round-trip through the generated form", async ({ page }) =
   await d.locator("[data-field=blob] textarea").blur();
   // reference through the picker (restricted to req)
   await d.locator("[data-field=ref] button", { hasText: "Select" }).click();
-  await page.locator("groundsill-picker input").fill(target.title);
+  await page.locator("corestone-picker input").fill(target.title);
   await page.locator(".picker-results .row", { hasText: target.title }).click();
   await expect(d.locator("[data-field=ref] .ref-chip")).toContainText(target.title);
   // multi reference: pick twice (same artifact is deduplicated)
   await d.locator("[data-field=refs] button").click();
-  await page.locator("groundsill-picker input").fill(target.title);
+  await page.locator("corestone-picker input").fill(target.title);
   await page.locator(".picker-results .row", { hasText: target.title }).click();
   await expect(d.locator("[data-field=refs] .ref-chip")).toHaveCount(1);
   await d.locator("[data-test=create]").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText("Everything filled");
+  await expect(page.locator("corestone-detail h2")).toHaveText("Everything filled");
   const guid = page.url().match(/artifact\/([0-9a-f-]{36})/)![1];
   const stored = await get<{ data: { fields: Record<string, unknown> } }>(`/entries/${guid}`);
   expect(stored.data.fields).toMatchObject({
@@ -83,7 +83,7 @@ test("all field types round-trip through the generated form", async ({ page }) =
   });
   expect(String(stored.data.fields.when)).toMatch(/^2026-12-24T/);
   // the detail renders every value back
-  const f = page.locator("groundsill-detail");
+  const f = page.locator("corestone-detail");
   await expect(f.locator("[data-field=flag] input")).toBeChecked();
   await expect(f.locator("[data-field=count] input")).toHaveValue("42");
   await expect(f.locator("[data-field=one] select")).toHaveValue("b");
@@ -112,7 +112,7 @@ test("all field types round-trip through the generated form", async ({ page }) =
   expect(after.data.fields.blob).toEqual({ ok: true });
   // the reference chip links to the target
   await page.locator("[data-field=refs] .ref-chip a").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(target.title);
+  await expect(page.locator("corestone-detail h2")).toHaveText(target.title);
 });
 
 test("attachments: upload, list, use in an attachment field, open, delete", async ({ page }) => {

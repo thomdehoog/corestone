@@ -1,6 +1,6 @@
 # Design notes — the design guide vs. this implementation
 
-How this code base relates to the *Origoa Foundation* design guide (the project was since renamed Groundsill): what was adopted as
+How this code base relates to the *Origoa Foundation* design guide (the project was since renamed Corestone): what was adopted as
 written, what was adapted and why, what was deliberately not built, what testing changed, and
 what remains. Section numbers (§) refer to the guide.
 
@@ -37,10 +37,10 @@ status and pushed over the session channel.
 **Hierarchy with PostgreSQL's hierarchical path type (§3.11, §5.8).** Folder paths are stored as
 `ltree` (each name encoded exactly into a label) with a GiST index; subtree queries use `<@`.
 
-**Structured commit messages (§3.9, §5.5)** with human subjects plus `Groundsill-Op`, `Groundsill-Guid`
+**Structured commit messages (§3.9, §5.5)** with human subjects plus `Corestone-Op`, `Corestone-Guid`
 and related trailers; never interpreted, only displayed.
 
-**Metadata locality (§3.4).** Links and comments are stored in the nearest `.groundsill` above their
+**Metadata locality (§3.4).** Links and comments are stored in the nearest `.corestone` above their
 source/subject; moving an artifact or a folder relocates them, and a maintenance operation restores
 locality after manual Git changes. The validation service reports misplaced metadata.
 

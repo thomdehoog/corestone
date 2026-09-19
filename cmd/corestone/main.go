@@ -1,4 +1,4 @@
-// Command groundsilld serves Groundsill: a bare Git repository as
+// Command corestone serves Corestone: a bare Git repository as
 // the source of truth, a PostgreSQL projection for queries, the REST and
 // WebSocket APIs, and (optionally) the built web client.
 package main
@@ -17,8 +17,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/thomdehoog/groundsill/internal/foundation"
-	"github.com/thomdehoog/groundsill/internal/httpapi"
+	"github.com/thomdehoog/corestone/internal/foundation"
+	"github.com/thomdehoog/corestone/internal/httpapi"
 )
 
 // version is set at build time: go build -ldflags "-X main.version=1.2.3".
@@ -26,23 +26,23 @@ var version = "dev"
 
 func main() {
 	var (
-		repo      = flag.String("repo", envOr("GROUNDSILL_REPO", "data/groundsill.git"), "path of the bare Git repository (created if missing)")
-		branch    = flag.String("branch", envOr("GROUNDSILL_BRANCH", "main"), "branch the Foundation owns")
-		dsn       = flag.String("db", os.Getenv("GROUNDSILL_DB"), "PostgreSQL connection string (required), e.g. postgres://user:pass@localhost/groundsill?sslmode=disable")
-		addr      = flag.String("addr", envOr("GROUNDSILL_ADDR", "127.0.0.1:8080"), "listen address")
-		web       = flag.String("web", envOr("GROUNDSILL_WEB", "web/dist"), "directory with the built web client (empty to disable)")
-		watch     = flag.Duration("watch", envDuration("GROUNDSILL_WATCH", 3*time.Second), "how often to check for direct Git pushes (0 disables)")
-		origins   = flag.String("allow-origin", os.Getenv("GROUNDSILL_ALLOW_ORIGIN"), "comma-separated extra origins allowed to open WebSocket sessions (same-origin is always allowed)")
-		accessLog = flag.Bool("access-log", os.Getenv("GROUNDSILL_ACCESS_LOG") == "1", "log every HTTP request")
+		repo      = flag.String("repo", envOr("CORESTONE_REPO", "data/corestone.git"), "path of the bare Git repository (created if missing)")
+		branch    = flag.String("branch", envOr("CORESTONE_BRANCH", "main"), "branch the Foundation owns")
+		dsn       = flag.String("db", os.Getenv("CORESTONE_DB"), "PostgreSQL connection string (required), e.g. postgres://user:pass@localhost/corestone?sslmode=disable")
+		addr      = flag.String("addr", envOr("CORESTONE_ADDR", "127.0.0.1:8080"), "listen address")
+		web       = flag.String("web", envOr("CORESTONE_WEB", "web/dist"), "directory with the built web client (empty to disable)")
+		watch     = flag.Duration("watch", envDuration("CORESTONE_WATCH", 3*time.Second), "how often to check for direct Git pushes (0 disables)")
+		origins   = flag.String("allow-origin", os.Getenv("CORESTONE_ALLOW_ORIGIN"), "comma-separated extra origins allowed to open WebSocket sessions (same-origin is always allowed)")
+		accessLog = flag.Bool("access-log", os.Getenv("CORESTONE_ACCESS_LOG") == "1", "log every HTTP request")
 		showVer   = flag.Bool("version", false, "print the version and exit")
 	)
 	flag.Parse()
 	if *showVer {
-		fmt.Println("groundsilld", version)
+		fmt.Println("corestone", version)
 		return
 	}
 	if *dsn == "" {
-		fmt.Fprintln(os.Stderr, "groundsilld: -db (or GROUNDSILL_DB) is required: the PostgreSQL projection database")
+		fmt.Fprintln(os.Stderr, "corestone: -db (or CORESTONE_DB) is required: the PostgreSQL projection database")
 		os.Exit(2)
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -50,11 +50,11 @@ func main() {
 
 	f, err := foundation.Open(ctx, *repo, *branch, *dsn)
 	if err != nil {
-		log.Fatalf("groundsilld: %v", err)
+		log.Fatalf("corestone: %v", err)
 	}
 	defer func() {
 		if err := f.Close(); err != nil {
-			log.Printf("groundsilld: close: %v", err)
+			log.Printf("corestone: close: %v", err)
 		}
 	}()
 	if *watch > 0 {
@@ -75,11 +75,11 @@ func main() {
 	if *web != "" {
 		if st, err := os.Stat(filepath.Join(*web, "index.html")); err == nil && !st.IsDir() {
 			mux.Handle("/", spa(*web))
-			log.Printf("groundsilld: serving web client from %s", *web)
+			log.Printf("corestone: serving web client from %s", *web)
 		} else {
-			log.Printf("groundsilld: no web client at %s (API only)", *web)
+			log.Printf("corestone: no web client at %s (API only)", *web)
 			mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-				http.Error(w, "Groundsill API: see /api/repository", http.StatusNotFound)
+				http.Error(w, "Corestone API: see /api/repository", http.StatusNotFound)
 			})
 		}
 	}
@@ -98,17 +98,17 @@ func main() {
 	go func() {
 		defer close(done)
 		<-ctx.Done()
-		log.Printf("groundsilld: shutting down")
+		log.Printf("corestone: shutting down")
 		shutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		if err := srv.Shutdown(shutdown); err != nil {
-			log.Printf("groundsilld: shutdown: %v", err)
+			log.Printf("corestone: shutdown: %v", err)
 		}
 		api.Hub.Close()
 	}()
-	log.Printf("groundsilld %s: repository %s (branch %s), listening on http://%s", version, *repo, *branch, *addr)
+	log.Printf("corestone %s: repository %s (branch %s), listening on http://%s", version, *repo, *branch, *addr)
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalf("groundsilld: %v", err)
+		log.Fatalf("corestone: %v", err)
 	}
 	<-done
 }
@@ -127,7 +127,7 @@ func envDuration(key string, def time.Duration) time.Duration {
 	}
 	d, err := time.ParseDuration(v)
 	if err != nil {
-		log.Fatalf("groundsilld: %s: %v", key, err)
+		log.Fatalf("corestone: %s: %v", key, err)
 	}
 	return d
 }

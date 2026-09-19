@@ -1,4 +1,4 @@
-module github.com/thomdehoog/groundsill
+module github.com/thomdehoog/corestone
 
 go 1.24
 

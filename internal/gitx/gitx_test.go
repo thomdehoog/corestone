@@ -22,8 +22,8 @@ func TestCommitCycle(t *testing.T) {
 	if err != nil || head != "" {
 		t.Fatalf("unborn head = %q, %v", head, err)
 	}
-	c1, err := r.BuildCommit(ctx, "", "first\n\nGroundsill-Op: create\nGroundsill-Guid: abc\n", []Op{
-		{Path: "sp ace/x/.groundsill.json", Content: []byte(`{"a":1}`)},
+	c1, err := r.BuildCommit(ctx, "", "first\n\nCorestone-Op: create\nCorestone-Guid: abc\n", []Op{
+		{Path: "sp ace/x/.corestone.json", Content: []byte(`{"a":1}`)},
 		{Path: "ü/:magic/y.json", Content: []byte(`{"b":1}`)},
 	})
 	if err != nil {
@@ -54,7 +54,7 @@ func TestCommitCycle(t *testing.T) {
 	}
 	// second commit: modify one, delete the other
 	c2, err := r.BuildCommit(ctx, c1, "second", []Op{
-		{Path: "sp ace/x/.groundsill.json", Content: []byte(`{"a":2}`)},
+		{Path: "sp ace/x/.corestone.json", Content: []byte(`{"a":2}`)},
 		{Path: "ü/:magic/y.json", Delete: true},
 	})
 	if err != nil {
@@ -91,11 +91,11 @@ func TestCommitCycle(t *testing.T) {
 	if !ok || no {
 		t.Fatal("IsAncestor wrong")
 	}
-	log, err := r.Log(ctx, c2, []string{Literal("sp ace/x/.groundsill.json")}, 0)
+	log, err := r.Log(ctx, c2, []string{Literal("sp ace/x/.corestone.json")}, 0)
 	if err != nil || len(log) != 2 {
 		t.Fatalf("log=%v err=%v", log, err)
 	}
-	if log[1].Trailers["Groundsill-Op"] != "create" || log[1].Body != "" || log[1].Subject != "first" {
+	if log[1].Trailers["Corestone-Op"] != "create" || log[1].Body != "" || log[1].Subject != "first" {
 		t.Fatalf("trailers not parsed: %+v", log[1])
 	}
 	log, _ = r.Log(ctx, c2, []string{":(glob)**/y.json"}, 0)

@@ -37,16 +37,16 @@ test("keyboard shortcuts, breadcrumbs and browser history", async ({ page }) => 
   // open an artifact, Escape closes it, back reopens it
   await page.locator(`.tree .row[data-folder="${folder}/alpha"]`).click();
   await page.locator("table.grid tbody tr", { hasText: `Alpha one ${id}` }).click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Alpha one ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Alpha one ${id}`);
   await page.locator("body").click({ position: { x: 700, y: 60 } });
   await page.keyboard.press("Escape");
-  await expect(page.locator("groundsill-detail")).toHaveCount(0);
+  await expect(page.locator("corestone-detail")).toHaveCount(0);
   await page.goBack();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Alpha one ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Alpha one ${id}`);
   await page.goBack();
-  await expect(page.locator("groundsill-detail")).toHaveCount(0);
+  await expect(page.locator("corestone-detail")).toHaveCount(0);
   await page.goForward();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Alpha one ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Alpha one ${id}`);
   // the header brand goes home
   await page.locator("header .brand").click();
   await expect(page.locator(".toolbar .title")).toHaveText("Repository");
@@ -55,10 +55,10 @@ test("keyboard shortcuts, breadcrumbs and browser history", async ({ page }) => 
 test("deep links: section tab, expanded layout, folder context", async ({ page }) => {
   await page.goto(`/artifact/${guids.a}?tab=history&x=1`);
   await expect(page.locator(".quicklinks a.active")).toHaveText(/History/);
-  await expect(page.locator("groundsill-overview")).toBeHidden();
+  await expect(page.locator("corestone-overview")).toBeHidden();
   await expect(page.locator(".tree .row.selected")).toContainText("alpha"); // folder inferred from the artifact
   await page.locator(".detail-head button[title='Restore layout']").click();
-  await expect(page.locator("groundsill-overview")).toBeVisible();
+  await expect(page.locator("corestone-overview")).toBeVisible();
   await expect(page).not.toHaveURL(/x=1/);
   await page.locator(".quicklinks a", { hasText: "Comments" }).click();
   await expect(page).toHaveURL(/tab=comments/);
@@ -88,7 +88,7 @@ test("overview: kind chips, schema columns, subtree, sorting stability, social c
   await page.locator(".chip", { hasText: "Entries + Docs" }).click();
   await expect(table.locator("tbody tr")).toHaveCount(4);
   await page.locator("[data-test=subtree]").uncheck();
-  await expect(page.locator("groundsill-overview .empty-state")).toContainText("Nothing here yet");
+  await expect(page.locator("corestone-overview .empty-state")).toContainText("Nothing here yet");
   // by-type counts in the sidebar reflect the subtree
   await expect(page.locator(".tree .row[data-type=req] .count")).toHaveText("2");
   await page.locator(".tree .row[data-type=tc]").click();
@@ -112,40 +112,40 @@ test("search: text, HID, results across folders, clearing", async ({ page }) => 
 test("navigation collapse persists; responsive layout; dark mode", async ({ page, browser }) => {
   await page.goto(`/folder/${folder}`);
   await page.locator("header button[title='Toggle navigation']").click();
-  await expect(page.locator("groundsill-sidebar")).toBeHidden();
+  await expect(page.locator("corestone-sidebar")).toBeHidden();
   await page.reload();
-  await expect(page.locator("groundsill-sidebar")).toBeHidden();
+  await expect(page.locator("corestone-sidebar")).toBeHidden();
   await page.locator("header button[title='Toggle navigation']").click();
-  await expect(page.locator("groundsill-sidebar")).toBeVisible();
+  await expect(page.locator("corestone-sidebar")).toBeVisible();
   // phone-sized viewport: no horizontal overflow, table still usable
   await page.goto(`/folder/${folder}/alpha`);
   await page.setViewportSize({ width: 800, height: 900 });
-  await expect(page.locator("groundsill-sidebar")).toBeVisible(); // overlays the content on small screens
+  await expect(page.locator("corestone-sidebar")).toBeVisible(); // overlays the content on small screens
   await page.locator(".nav-scrim").click({ position: { x: 700, y: 400 } }); // tapping beside the overlay closes it
-  await expect(page.locator("groundsill-sidebar")).toBeHidden();
+  await expect(page.locator("corestone-sidebar")).toBeHidden();
   await page.locator("table.grid tbody tr").first().click();
-  await expect(page.locator("groundsill-detail h2")).toBeVisible();
+  await expect(page.locator("corestone-detail h2")).toBeVisible();
   const overflow = await page.evaluate(() => document.querySelector(".shell")!.scrollWidth - document.querySelector(".shell")!.clientWidth);
   expect(overflow).toBe(0);
   // a first visit on a phone starts with the navigation closed; choosing a folder closes it again
   const phone = await browser.newContext({ viewport: { width: 420, height: 860 } });
   const small = await phone.newPage();
   await small.goto(`/folder/${folder}?subtree=1`);
-  await expect(small.locator("groundsill-sidebar")).toBeHidden();
+  await expect(small.locator("corestone-sidebar")).toBeHidden();
   await expect(small.locator("table.grid tbody tr").first()).toBeVisible();
   await small.locator("header button[title='Toggle navigation']").click();
-  await expect(small.locator("groundsill-sidebar")).toBeVisible();
+  await expect(small.locator("corestone-sidebar")).toBeVisible();
   await small.locator(`.tree .row[data-folder='${folder}/alpha']`).click();
-  await expect(small.locator("groundsill-sidebar")).toBeHidden();
+  await expect(small.locator("corestone-sidebar")).toBeHidden();
   await expect(small).toHaveURL(new RegExp(`/folder/${folder}/alpha`));
   await small.locator("table.grid tbody tr").first().click();
-  await expect(small.locator("groundsill-detail h2")).toBeVisible();
+  await expect(small.locator("corestone-detail h2")).toBeVisible();
   await phone.close();
   // dark mode renders with dark background and readable text
   const ctx = await browser.newContext({ colorScheme: "dark", viewport: { width: 1200, height: 800 } });
   const dark = await ctx.newPage();
   await dark.goto(`/artifact/${guids.a}`);
-  await expect(dark.locator("groundsill-detail h2")).toHaveText(`Alpha one ${id}`);
+  await expect(dark.locator("corestone-detail h2")).toHaveText(`Alpha one ${id}`);
   const bg = await dark.evaluate(() => getComputedStyle(document.body).backgroundColor);
   expect(bg).toMatch(/rgb\((\d+), (\d+), (\d+)\)/);
   const [r, g, b] = bg.match(/\d+/g)!.map(Number);
@@ -180,7 +180,7 @@ test("status indicator, user name and reindex", async ({ page }) => {
 
 test("the divider between overview and detail can be dragged, keyed, reset, and is remembered", async ({ page }) => {
   await page.goto(`/folder/${folder}/alpha`);
-  const overview = page.locator("groundsill-overview");
+  const overview = page.locator("corestone-overview");
   const bar = page.locator("[data-test=splitter]");
   const height = async () => (await overview.boundingBox())!.height;
   const initial = await height();
@@ -200,7 +200,7 @@ test("the divider between overview and detail can be dragged, keyed, reset, and 
   await expect.poll(height).toBeCloseTo(initial, -1);
   // hidden when the detail view is expanded
   await page.goto(`/artifact/${guids.a}?x=1`);
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Alpha one ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Alpha one ${id}`);
   await expect(bar).toBeHidden();
-  expect((await page.locator("groundsill-detail").boundingBox())!.height).toBeGreaterThan(300);
+  expect((await page.locator("corestone-detail").boundingBox())!.height).toBeGreaterThan(300);
 });

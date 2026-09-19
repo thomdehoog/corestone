@@ -43,7 +43,7 @@ func TestHTTPAbuse(t *testing.T) {
 
 	// path tricks
 	for _, p := range []string{
-		"/api/artifacts/" + g + "/files/..%2F..%2F.groundsill.json", "/api/artifacts/" + g + "/files/%2e%2e", "/api/artifacts/" + g + "/files/.groundsill.json",
+		"/api/artifacts/" + g + "/files/..%2F..%2F.corestone.json", "/api/artifacts/" + g + "/files/%2e%2e", "/api/artifacts/" + g + "/files/.corestone.json",
 		"/api/schemas/%2e%2e%2fx", "/api/schemas/..", "/api/schemas/.hidden", "/api/workflows/a%2Fb", "/api/repository/hids/%00",
 	} {
 		res := a.do("GET", p, "")
@@ -68,7 +68,7 @@ func TestHTTPAbuse(t *testing.T) {
 	a.ok("PUT", "/api/entries/"+g, `{"title":"bell\u0007"}`, 400)
 	a.ok("POST", "/api/artifacts/"+g+"/move", `{"path":"x/`+strings.Repeat("y", 300)+`"}`, 400)
 	a.ok("POST", "/api/repository/folders/move", `{"from":"","to":"y"}`, 400)
-	a.ok("POST", "/api/repository/folders/move", `{"from":"x","to":".groundsill"}`, 400)
+	a.ok("POST", "/api/repository/folders/move", `{"from":"x","to":".corestone"}`, 400)
 	a.ok("POST", "/api/links", `{"type":"related","source":"`+g+`","target":"`+g+`"}`, 400)
 	a.ok("POST", "/api/comments", `{"subject":"`+g+`","text":"`+strings.Repeat("c", 300*1024)+`"}`, 400)
 	a.ok("POST", "/api/comments", `{"subject":"`+strings.ToUpper(g)+`","text":"upper-case guid is fine"}`, 201)

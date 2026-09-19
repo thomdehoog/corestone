@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# REST end-to-end check: seeds a demo domain into a running groundsilld and
+# REST end-to-end check: seeds a demo domain into a running corestone and
 # asserts on real responses across the whole artifact lifecycle.
 #
 #   ./scripts/e2e.sh [http://127.0.0.1:8080]
@@ -48,7 +48,7 @@ curl -sfS -X POST "$API/artifacts/$R1/move" -H 'Content-Type: application/json' 
 curl -sfS "$API/entries/$R1" | py "m=json.load(sys.stdin)['meta']; assert m['folder']=='archive/e2e' and m['workflows']['dev']=='review', m"
 curl -sfS "$API/artifacts/$R1/comments" | py "c=json.load(sys.stdin)['comments']; assert len(c)==2 and c[1]['data']['parent']==c[0]['meta']['guid'], c"
 curl -sfS "$API/artifacts/$R1/history" | py "
-h=json.load(sys.stdin)['history']; assert any('moved' in e['subject'] for e in h) and h[-1]['trailers']['Groundsill-Op']=='create', h"
+h=json.load(sys.stdin)['history']; assert any('moved' in e['subject'] for e in h) and h[-1]['trailers']['Corestone-Op']=='create', h"
 
 # HID lookup, validation, deleted tracking, reindex convergence.
 curl -sfS "$API/repository/hids/REQ-1" | py "assert json.load(sys.stdin)['records'][0]['guid']=='$R1'"

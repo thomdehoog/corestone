@@ -1,4 +1,4 @@
-/* Groundsill web client — one stylesheet, light DOM components. */
+/* Corestone web client — one stylesheet, light DOM components. */
 :root {
   color-scheme: light dark;
   --bg: #f6f7fb;
@@ -54,10 +54,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; }
 ::placeholder { color: var(--muted); }
 
 /* ---- layout ---- */
-groundsill-app { display: block; height: 100%; }
+corestone-app { display: block; height: 100%; }
 .shell { display: grid; grid-template-rows: var(--header-h) minmax(0, 1fr); grid-template-columns: var(--nav-w) minmax(0, 1fr); height: 100%; overflow: hidden; }
 .shell.nav-collapsed { grid-template-columns: 0 1fr; }
-.shell.nav-collapsed groundsill-sidebar { display: none; }
+.shell.nav-collapsed corestone-sidebar { display: none; }
 .header { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 0 14px; background: var(--panel); border-bottom: 1px solid var(--border); }
 .header .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; letter-spacing: 0.2px; }
 .header .brand .logo { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: grid; place-items: center; }
@@ -70,12 +70,12 @@ groundsill-app { display: block; height: 100%; }
 .dot.ok { background: var(--ok); }
 .dot.warn { background: var(--warn); }
 .dot.bad { background: var(--danger); }
-groundsill-sidebar, .nav-scrim { grid-column: 1; }
+corestone-sidebar, .nav-scrim { grid-column: 1; }
 .main { grid-column: 2; display: grid; grid-template-rows: minmax(120px, var(--split, 38%)) 7px minmax(0, 1fr); min-height: 0; min-width: 0; }
 .main.expanded { grid-template-rows: 1fr; }
-.main.expanded groundsill-overview { display: none; }
+.main.expanded corestone-overview { display: none; }
 .main.document { grid-template-rows: 1fr; }
-.main.document groundsill-overview { display: none; }
+.main.document corestone-overview { display: none; }
 .main.expanded .splitter, .main.document .splitter { display: none; }
 .splitter { cursor: row-resize; touch-action: none; background: var(--panel-2); border-bottom: 1px solid var(--border); position: relative; }
 .splitter::after { content: ""; position: absolute; left: 50%; top: 2px; width: 36px; height: 2px; margin-left: -18px; border-radius: 2px; background: var(--border); }
@@ -83,7 +83,7 @@ groundsill-sidebar, .nav-scrim { grid-column: 1; }
 .splitter:hover::after, .splitter.dragging::after, .splitter:focus-visible::after { background: var(--accent); }
 
 /* ---- sidebar ---- */
-groundsill-sidebar { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--panel); border-right: 1px solid var(--border); }
+corestone-sidebar { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--panel); border-right: 1px solid var(--border); }
 .nav-search { padding: 12px 12px 6px; display: flex; flex-direction: column; gap: 8px; }
 .nav-search input { width: 100%; }
 .nav-toggle { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--muted); }
@@ -103,7 +103,7 @@ groundsill-sidebar { display: flex; flex-direction: column; min-height: 0; min-w
 .tree ul { list-style: none; margin: 0; padding-left: 14px; }
 
 /* ---- overview ---- */
-groundsill-overview { display: flex; flex-direction: column; min-height: 0; min-width: 0; border-bottom: 1px solid var(--border); background: var(--panel); }
+corestone-overview { display: flex; flex-direction: column; min-height: 0; min-width: 0; border-bottom: 1px solid var(--border); background: var(--panel); }
 .toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .toolbar .title { font-weight: 600; }
 .toolbar .hint { color: var(--muted); font-size: 12.5px; }
@@ -154,7 +154,7 @@ textarea { resize: vertical; min-height: 70px; }
 .ref-chip button { border: none; background: none; cursor: pointer; color: var(--muted); padding: 0; }
 
 /* ---- detail ---- */
-groundsill-detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg); }
+corestone-detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--bg); }
 .detail-head { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .detail-head h2 { font-size: 17px; flex: 1; min-width: 200px; }
 .detail-head .meta { color: var(--muted); font-size: 12.5px; display: flex; gap: 10px; align-items: center; }
@@ -205,7 +205,7 @@ groundsill-detail { display: flex; flex-direction: column; min-height: 0; min-wi
 .notice.error { background: var(--danger-soft); color: var(--danger); }
 
 /* ---- document view ---- */
-groundsill-document { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 0; min-width: 0; background: var(--bg); }
+corestone-document { display: grid; grid-template-columns: minmax(0, 1fr) auto; min-height: 0; min-width: 0; background: var(--bg); }
 .doc-main { display: flex; flex-direction: column; min-height: 0; }
 .doc-toolbar { display: flex; gap: 6px; align-items: center; padding: 8px 14px; background: var(--panel); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
 .doc-toolbar .sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
@@ -275,9 +275,9 @@ kbd { font: 11px var(--mono); border: 1px solid var(--border); border-bottom-wid
 .nav-scrim { display: none; }
 @media (max-width: 900px) {
   .shell { grid-template-columns: 0 1fr; }
-  .shell:not(.nav-collapsed) groundsill-sidebar { position: fixed; top: var(--header-h); bottom: 0; left: 0; width: min(320px, 90vw); z-index: 30; box-shadow: var(--shadow); }
+  .shell:not(.nav-collapsed) corestone-sidebar { position: fixed; top: var(--header-h); bottom: 0; left: 0; width: min(320px, 90vw); z-index: 30; box-shadow: var(--shadow); }
   .shell:not(.nav-collapsed) .nav-scrim { display: block; position: fixed; top: var(--header-h); right: 0; bottom: 0; left: 0; z-index: 29; background: rgba(10, 14, 24, 0.35); }
-  .shell.nav-collapsed groundsill-sidebar { display: none; }
+  .shell.nav-collapsed corestone-sidebar { display: none; }
   .header .crumbs { display: none; }
   .header .status { display: none; }
   .toolbar .hint { display: none; }
@@ -286,7 +286,7 @@ kbd { font: 11px var(--mono); border: 1px solid var(--border); border-bottom-wid
   .quicklinks { display: none; }
   .field { grid-template-columns: 1fr; }
   .doc-page { padding: 24px 18px; }
-  groundsill-document { grid-template-columns: 1fr; }
+  corestone-document { grid-template-columns: 1fr; }
   .doc-side { width: 100%; }
 }
 

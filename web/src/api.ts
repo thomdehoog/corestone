@@ -12,11 +12,11 @@ export class ApiError extends Error {
 function userHeader(): Record<string, string> {
   let user = "";
   try {
-    user = localStorage.getItem("groundsill.user") || "";
+    user = localStorage.getItem("corestone.user") || "";
   } catch {
     /* storage unavailable */
   }
-  return user ? { "X-Groundsill-User": encodeURIComponent(user) } : {};
+  return user ? { "X-Corestone-User": encodeURIComponent(user) } : {};
 }
 
 async function request<T>(method: string, path: string, body?: unknown, headers: Record<string, string> = {}): Promise<T> {

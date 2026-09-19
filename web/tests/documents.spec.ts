@@ -103,7 +103,7 @@ test("title edit, entry cards, images from attachments and the entry sidebar", a
   // entry card shows fields and workflow state; clicking opens it; the sidebar shows the current entry
   await page.locator(".block-wrap[data-type=paragraph] .block").first().click();
   await page.locator("[data-test=insert-entry]").click();
-  await page.locator("groundsill-picker input").fill(`Card target ${id}`);
+  await page.locator("corestone-picker input").fill(`Card target ${id}`);
   await page.locator(".picker-results .row", { hasText: `Card target ${id}` }).click();
   const card = page.locator(`.entry-card[data-entry="${r.meta.guid}"]`);
   await expect(card).toContainText("priority");
@@ -187,6 +187,6 @@ test("document creation from the + menu starts with an empty page", async ({ pag
   await expect(page.locator("[data-test=save]")).toBeEnabled();
   // close without saving: the artifact keeps its stored content
   await page.locator(".doc-toolbar button[title='Back to overview']").click();
-  await expect(page.locator("groundsill-document")).toHaveCount(0);
+  await expect(page.locator("corestone-document")).toHaveCount(0);
   await expect(page.locator("table.grid tbody tr", { hasText: `Fresh ${id}` }).locator(".kind-icon.document")).toBeVisible();
 });

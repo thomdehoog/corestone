@@ -3,7 +3,7 @@ package scanner
 import (
 	"testing"
 
-	"github.com/thomdehoog/groundsill/internal/model"
+	"github.com/thomdehoog/corestone/internal/model"
 )
 
 func TestClassify(t *testing.T) {
@@ -15,22 +15,22 @@ func TestClassify(t *testing.T) {
 		kind string
 		rel  bool
 	}{
-		{g + "/.groundsill.json", Artifact, "", true},
-		{"a/b/" + g + "/.groundsill.json", Artifact, "", true},
+		{g + "/.corestone.json", Artifact, "", true},
+		{"a/b/" + g + "/.corestone.json", Artifact, "", true},
 		{"a/" + g + "/spec.pdf", Attachment, "", true},
 		{"a/" + g + "/sub/x.png", Attachment, "", true},
-		{".groundsill/schemas/req.json", ConfigFile, ConfigSchemas, true},
-		{"a/.groundsill/workflows/dev.json", ConfigFile, ConfigWorkflows, true},
-		{"a/.groundsill/links/" + g + ".json", ConfigFile, ConfigLinks, true},
-		{"a/.groundsill/comments/" + g + ".json", ConfigFile, ConfigComments, true},
-		{".groundsill/scanner.json", ConfigFile, ConfigScanner, true},
-		{"a/.groundsill/scanner.json", ConfigFile, ConfigOther, false},
-		{".groundsill/ext/thing.json", ConfigFile, ConfigOther, false},
+		{".corestone/schemas/req.json", ConfigFile, ConfigSchemas, true},
+		{"a/.corestone/workflows/dev.json", ConfigFile, ConfigWorkflows, true},
+		{"a/.corestone/links/" + g + ".json", ConfigFile, ConfigLinks, true},
+		{"a/.corestone/comments/" + g + ".json", ConfigFile, ConfigComments, true},
+		{".corestone/scanner.json", ConfigFile, ConfigScanner, true},
+		{"a/.corestone/scanner.json", ConfigFile, ConfigOther, false},
+		{".corestone/ext/thing.json", ConfigFile, ConfigOther, false},
 		{"README.md", Ignore, "", false},
 		{"a/b/notes.txt", Ignore, "", false},
 		{g, Ignore, "", false},
 		{"", Ignore, "", false},
-		{"/" + g + "/.groundsill.json", Ignore, "", false},
+		{"/" + g + "/.corestone.json", Ignore, "", false},
 	}
 	for _, c := range cases {
 		m, rel := s.Match(c.path)
@@ -38,25 +38,25 @@ func TestClassify(t *testing.T) {
 			t.Errorf("%q: got %v/%q/%v want %v/%q/%v", c.path, m.Category, m.ConfigKind, rel, c.cat, c.kind, c.rel)
 		}
 	}
-	m := s.Classify("a/b/" + g + "/.groundsill.json")
+	m := s.Classify("a/b/" + g + "/.corestone.json")
 	if m.Folder != "a/b" || m.GUID != g {
 		t.Fatalf("%+v", m)
 	}
-	m = s.Classify("x/.groundsill/links/" + g + ".json")
+	m = s.Classify("x/.corestone/links/" + g + ".json")
 	if m.Folder != "x" || m.Name != g {
 		t.Fatalf("%+v", m)
 	}
 	// Config folder wins over a GUID that appears later, and vice versa.
-	if m := s.Classify(".groundsill/" + g + "/.groundsill.json"); m.Category != ConfigFile || m.ConfigKind != ConfigOther {
+	if m := s.Classify(".corestone/" + g + "/.corestone.json"); m.Category != ConfigFile || m.ConfigKind != ConfigOther {
 		t.Fatalf("%+v", m)
 	}
-	if m := s.Classify(g + "/.groundsill/schemas/x.json"); m.Category != Attachment {
+	if m := s.Classify(g + "/.corestone/schemas/x.json"); m.Category != Attachment {
 		t.Fatalf("%+v", m)
 	}
 }
 
 func TestConfig(t *testing.T) {
-	c, err := ParseConfig([]byte(`{"guid_files":[".groundsill.json","artifact.json"],"config_folders":[".groundsill",".meta"],"indexers":["foundation","ext"]}`))
+	c, err := ParseConfig([]byte(`{"guid_files":[".corestone.json","artifact.json"],"config_folders":[".corestone",".meta"],"indexers":["foundation","ext"]}`))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,8 +84,8 @@ func TestConfig(t *testing.T) {
 }
 
 func FuzzClassify(f *testing.F) {
-	f.Add("a/.groundsill/links/x.json")
-	f.Add(model.NewGUID() + "/.groundsill.json")
+	f.Add("a/.corestone/links/x.json")
+	f.Add(model.NewGUID() + "/.corestone.json")
 	f.Fuzz(func(t *testing.T, p string) {
 		s := Default()
 		m := s.Classify(p)

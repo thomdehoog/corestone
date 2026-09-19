@@ -16,8 +16,8 @@ linters:
         - (io.Closer).Close
         - (io.ReadCloser).Close
         - (*github.com/coder/websocket.Conn).CloseNow
-        - (*github.com/thomdehoog/groundsill/internal/projection.DB).Close
-        - (*github.com/thomdehoog/groundsill/internal/foundation.Foundation).Close
+        - (*github.com/thomdehoog/corestone/internal/projection.DB).Close
+        - (*github.com/thomdehoog/corestone/internal/foundation.Foundation).Close
         - os.Remove
         - (io.Writer).Write
         - (hash.Hash).Write

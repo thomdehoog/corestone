@@ -47,7 +47,7 @@ test("the folder field marks new segments, catches typos and browses the tree", 
   await page.locator("#new-title").fill(`Booted ${id}`);
   await page.locator(".dialog select").first().selectOption("high");
   await page.locator(".dialog button[type=submit]").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Booted ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Booted ${id}`);
   const tree = await get<{ folders: { name: string }[] }>(`/repository/tree?path=${folder}/specs`);
   expect(tree.folders.map((f) => f.name)).toContain("boot");
 });
@@ -67,7 +67,7 @@ test("New folder plans a destination that becomes real with its first artifact",
   await page.locator("#new-title").fill(`Planned ${id}`);
   await page.locator(".dialog select").first().selectOption("high");
   await page.locator(".dialog button[type=submit]").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Planned ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Planned ${id}`);
   await expect(row).not.toHaveClass(/pending/);
 });
 
@@ -87,7 +87,7 @@ test("the navigation is rooted at the current folder, with an up row and a filte
   const wide = `${folder}/wide`;
   for (let i = 0; i < 17; i++) await post("/entries", { path: `${wide}/part-${String(i).padStart(2, "0")}/sub`, type: "req", title: `W${i} ${id}`, fields: { priority: "low" } });
   await page.goto(`/folder/${folder}`);
-  const rows = page.locator("groundsill-sidebar ul.tree").first().locator(".row");
+  const rows = page.locator("corestone-sidebar ul.tree").first().locator(".row");
   await expect(rows.first()).toHaveAttribute("data-folder", folder);
   await expect(page.locator("[data-test=nav-up]")).toHaveText(/Repository/);
   await expect(page.locator("[data-test=folder-filter]")).toHaveCount(0);
@@ -137,7 +137,7 @@ test("the New dialog follows the typed folder's schema scope", async ({ page }) 
   await page.locator("#new-title").fill(`Deeper ${id}`);
   await page.locator(".dialog select").first().selectOption("high");
   await page.locator("[data-test=create]").click();
-  await expect(page.locator("groundsill-detail h2")).toHaveText(`Deeper ${id}`);
+  await expect(page.locator("corestone-detail h2")).toHaveText(`Deeper ${id}`);
 });
 
 test("the overview says when subfolders hold more than the folder itself", async ({ page }) => {

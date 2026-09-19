@@ -1,6 +1,6 @@
 package foundation
 
-import "github.com/thomdehoog/groundsill/internal/ojson"
+import "github.com/thomdehoog/corestone/internal/ojson"
 
 type ojsonObject = ojson.Object
 

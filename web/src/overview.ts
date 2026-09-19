@@ -9,7 +9,7 @@ import { kindIcon, relTime } from "./util";
 // Artifact overview (design guide §7.4): every artifact matching the
 // navigation context in a table whose columns come from the schemas.
 
-@customElement("groundsill-overview")
+@customElement("corestone-overview")
 export class Overview extends LitElement {
   private unsub?: () => void;
   private s!: State;

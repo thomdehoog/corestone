@@ -72,6 +72,63 @@ Populate a demo domain and open <http://127.0.0.1:8080>:
 ./examples/seed.sh http://127.0.0.1:8080
 ```
 
+### Large technical portfolio
+
+The separate [seed-large.sh](.bash examples/seed-large.sh) leaves the small seed unchanged and creates
+an isolated portfolio below `scale-lab/`. It requires Bash and Python 3.9+ (standard library only).
+It creates **exactly 1,000 entries**, plus documents, links, threaded comments and lifecycle
+transitions. The six projects deliberately use overlapping and different artifact types:
+
+| Project | Entries | Layout and focus |
+|---|---:|---|
+| Tideline Pi | 200 | Deep Raspberry Pi CM4 firmware, ADC drivers, gateway services and OTA updates |
+| Verdant MCU | 120 | Flat STM32 irrigation controller requirements, verification, defects and tasks |
+| Harbor Web | 220 | Wide frontend, gateway, identity, billing and notification component trees |
+| Harbor Data | 220 | Web counterpart: PostgreSQL, ingestion, migrations, isolation and recovery |
+| Prism ASIC | 160 | Mixed-signal optical sensor, analog/digital blocks, PCB and bench characterization |
+| Moss LoRa | 80 | Flat low-power telemetry requirements, tests and tasks; no documents or comments |
+
+The default workload has 123 configuration files across 47 scopes. It exercises inherited and
+independent type systems, project-specific workflow sequences, scoped enum ordering, and module
+field refinements. Documents embed real entry references. Links connect requirements,
+specifications, verification evidence, defects and implementation work; cross-project links and
+an interface-contract document pair Harbor Web with Harbor Data.
+
+```sh
+# Generate and check counts without any server access or writes.
+bash examples/seed-large.sh --dry-run
+
+# Seed a running server, then verify all artifact counts and configuration validity.
+bash examples/seed-large.sh http://127.0.0.1:8080
+
+# Different deterministic content and a fresh namespace.
+bash examples/seed-large.sh http://127.0.0.1:8080 --root another-portfolio --seed 42
+
+# Preview 100,000 or 1,000,000 entries, excluding documents/links/comments.
+bash examples/seed-large.sh --dry-run --scale 100
+bash examples/seed-large.sh --dry-run --scale 1000
+
+# A custom exact size; --scale multiplies this number.
+bash examples/seed-large.sh --dry-run --count 2500
+
+# Offline tests: definitions, references, counts, layout and repeatability.
+python3 examples/seed-large.test.py
+```
+
+Add the server URL and a fresh `--root` to a large-scale command to actually persist it.
+Every configuration/artifact write and transition goes through the API and creates a Git commit;
+this is a baseline workload generator, **not** a bulk-import facility or a promise of million-entry
+throughput. It prints progress, elapsed time, per-project counts and a workload digest. The digest
+is repeatable for identical dry-run arguments (live GUIDs are server-assigned). Memory retains
+only a small reference set per module rather than every artifact. Directory and title variants
+expand as the requested count grows.
+
+The script refuses an occupied namespace, including configuration-only scopes. It never deletes
+or rewrites existing artifacts and does not resume a partial run: after a failed run, inspect the
+reported API error and use a new namespace. Only explicit maintenance responses with `Retry-After`
+are retried; network errors and ambiguous write outcomes fail visibly rather than duplicating
+artifacts. Set `PYTHON=python` on systems where Python 3 is named `python` instead of `python3`.
+
 ## 5. Define your own domain
 
 Corestone has no built-in types. A domain is a set of configuration files in a folder's

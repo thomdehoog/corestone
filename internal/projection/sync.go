@@ -247,7 +247,7 @@ func (p *DB) ProjectCommit(ctx context.Context, tx *sql.Tx, commit string, chang
 			return err
 		}
 	}
-	return nil
+	return recordCommit(ctx, tx, commit, changes)
 }
 
 func (p *DB) upsertConfig(ctx context.Context, tx *sql.Tx, c *ConfigRecord) error {

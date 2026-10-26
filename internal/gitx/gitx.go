@@ -522,6 +522,19 @@ func (r *Repo) Log(ctx context.Context, rev string, pathspecs []string, limit in
 	return parseLog(out), nil
 }
 
+// Commits returns the log entries of the given commits, in the given order.
+func (r *Repo) Commits(ctx context.Context, shas []string) ([]LogEntry, error) {
+	if len(shas) == 0 {
+		return nil, nil
+	}
+	out, err := r.run(ctx, []byte(strings.Join(shas, "\n")+"\n"),
+		"log", "-z", "--format="+logFormat, "--no-walk=unsorted", "--stdin")
+	if err != nil {
+		return nil, err
+	}
+	return parseLog(out), nil
+}
+
 func parseLog(out []byte) []LogEntry {
 	var entries []LogEntry
 	fields := bytes.Split(out, []byte{0})

@@ -339,12 +339,39 @@ func (f *Foundation) Comments(ctx context.Context, guid string) ([]CommentView, 
 }
 
 // History lists the commits that touched an artifact, following its GUID
-// across moves.
+// across moves. It reads the commit list from the projection's per-artifact
+// index; only while a rebuild has not yet produced that index does it fall
+// back to scanning the whole Git history.
 func (f *Foundation) History(ctx context.Context, guid string, limit int) ([]gitx.LogEntry, error) {
 	guid, err := model.NormalizeGUID(guid)
 	if err != nil {
 		return nil, model.ErrNotFound
 	}
+	if f.DB.Status().Capabilities.History {
+		if err := f.catchUp(ctx); err != nil && !errors.Is(err, model.ErrMaintenance) {
+			return nil, err
+		}
+		if f.DB.Status().Capabilities.History {
+			shas, err := f.DB.ArtifactCommits(ctx, guid, limit)
+			if err != nil {
+				return nil, err
+			}
+			log, err := f.Repo.Commits(ctx, shas)
+			if err != nil {
+				return nil, err
+			}
+			if log == nil {
+				log = []gitx.LogEntry{}
+			}
+			return log, nil
+		}
+	}
+	return f.scanHistory(ctx, guid, limit)
+}
+
+// scanHistory finds an artifact's commits with a pathspec walk over the
+// whole history: always correct, but linear in the repository's age.
+func (f *Foundation) scanHistory(ctx context.Context, guid string, limit int) ([]gitx.LogEntry, error) {
 	head, err := f.Repo.Head(ctx)
 	if err != nil {
 		return nil, err

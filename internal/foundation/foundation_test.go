@@ -328,6 +328,14 @@ func TestLifecycle(t *testing.T) {
 			t.Fatalf("file survived delete: %s", e.Path)
 		}
 	}
+	// The history index matches a full Git scan for live, moved and deleted
+	// artifacts, both as maintained by writes and as rebuilt by a reindex.
+	histGUIDs := []string{r1.Meta.GUID, r2.Meta.GUID, ov.Meta.GUID, l1.Meta.GUID, c1.Meta.GUID, c2.Meta.GUID}
+	assertHistoryIndexed(t, f, histGUIDs...)
+	if err := f.DB.Reindex(ctx); err != nil {
+		t.Fatal(err)
+	}
+	assertHistoryIndexed(t, f, histGUIDs...)
 	// overlay base is now dangling: validation reports it, overlay resolution fails cleanly
 	issues, _ := f.DB.Validate(ctx)
 	found := false

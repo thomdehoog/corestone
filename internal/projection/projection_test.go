@@ -266,8 +266,22 @@ func TestForeignHistoryTriggersRebuild(t *testing.T) {
 	if ph, _ := p.ProcessedHash(ctx); ph != c2 {
 		t.Fatal("processed hash")
 	}
-	if st := p.Status(); st.Maintenance || !st.Capabilities.Search {
+	if st := p.Status(); st.Maintenance || !st.Capabilities.Search || !st.Capabilities.History {
 		t.Fatalf("status after rebuild %+v", st)
+	}
+}
+
+func TestLeaveMaintenancePreservesHistoryReadiness(t *testing.T) {
+	p, _ := testDB(t)
+	for _, ready := range []bool{false, true} {
+		if !p.EnterMaintenance("testing history readiness") {
+			t.Fatal("could not enter maintenance")
+		}
+		p.setStatus(func(s *Status) { s.Capabilities.History = ready })
+		p.LeaveMaintenance()
+		if st := p.Status(); st.Maintenance || st.Capabilities.History != ready {
+			t.Fatalf("history readiness %v after maintenance: %+v", ready, st)
+		}
 	}
 }
 

@@ -63,9 +63,10 @@ type Status struct {
 
 // Capabilities says which services are available while a rebuild runs.
 type Capabilities struct {
-	Lookup bool `json:"lookup"` // GUID → path (after reindex phase 1)
-	Query  bool `json:"query"`  // metadata/field queries (after phase 2)
-	Search bool `json:"search"` // full-text search (after phase 3)
+	Lookup  bool `json:"lookup"`  // GUID → path (after reindex phase 1)
+	Query   bool `json:"query"`   // metadata/field queries (after phase 2)
+	Search  bool `json:"search"`  // full-text search (after phase 3)
+	History bool `json:"history"` // per-artifact commit index (after phase 4)
 }
 
 // Ping checks that the projection database is reachable.
@@ -84,7 +85,7 @@ func Open(ctx context.Context, dsn string, repo *gitx.Repo) (*DB, error) {
 		return nil, fmt.Errorf("projection database: %w", err)
 	}
 	p := &DB{sql: db, repo: repo, LargeOpThreshold: 500, scanner: scanner.Default()}
-	p.status.Capabilities = Capabilities{Lookup: true, Query: true, Search: true}
+	p.status.Capabilities = Capabilities{Lookup: true, Query: true, Search: true, History: true}
 	if err := p.migrate(ctx); err != nil {
 		db.Close()
 		return nil, err
@@ -192,7 +193,7 @@ func (p *DB) LeaveMaintenance() {
 	p.setStatus(func(s *Status) {
 		s.Maintenance, s.Reason, s.Phase, s.StartedAt = false, "", "", nil
 		s.Progress, s.Total = 0, 0
-		s.Capabilities = Capabilities{Lookup: true, Query: true, Search: true}
+		s.Capabilities = Capabilities{Lookup: true, Query: true, Search: true, History: s.Capabilities.History}
 	})
 }
 
@@ -330,6 +331,13 @@ var ddl = []string{
 		until_commit text,
 		PRIMARY KEY (guid, hid, since_commit))`,
 	`CREATE INDEX IF NOT EXISTS hid_history_hid ON hid_history (hid)`,
+	`CREATE TABLE IF NOT EXISTS artifact_commits (
+		guid text NOT NULL,
+		commit_sha text NOT NULL,
+		seq bigint NOT NULL,
+		PRIMARY KEY (guid, commit_sha))`,
+	`CREATE INDEX IF NOT EXISTS artifact_commits_guid_seq ON artifact_commits (guid, seq DESC)`,
+	`CREATE INDEX IF NOT EXISTS artifact_commits_seq ON artifact_commits (seq)`,
 	`CREATE TABLE IF NOT EXISTS file_issues (
 		path text PRIMARY KEY,
 		guid text NOT NULL,
@@ -347,9 +355,20 @@ var ddl = []string{
 }
 
 func (p *DB) migrate(ctx context.Context) error {
+	var hadCommits bool
+	if err := p.sql.QueryRowContext(ctx, `SELECT to_regclass(quote_ident(current_schema()) || '.artifact_commits') IS NOT NULL`).Scan(&hadCommits); err != nil {
+		return fmt.Errorf("projection schema: %w", err)
+	}
 	for _, stmt := range ddl {
 		if _, err := p.sql.ExecContext(ctx, stmt); err != nil {
 			return fmt.Errorf("projection schema: %w (statement: %.60s)", err, stmt)
+		}
+	}
+	if !hadCommits {
+		// A projection built before artifact_commits existed lacks the
+		// history index: force a rebuild, which backfills it from Git.
+		if _, err := p.sql.ExecContext(ctx, `UPDATE repo_state SET processed_hash = '' WHERE id = 1`); err != nil {
+			return fmt.Errorf("projection schema: %w", err)
 		}
 	}
 	return nil

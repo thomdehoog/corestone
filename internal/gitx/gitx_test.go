@@ -102,6 +102,10 @@ func TestCommitCycle(t *testing.T) {
 	if len(log) != 2 {
 		t.Fatalf("glob log = %d", len(log))
 	}
+	byID, err := r.Commits(ctx, []string{c1, c2})
+	if err != nil || len(byID) != 2 || byID[0].SHA != c1 || byID[1].SHA != c2 || byID[0].Trailers["Corestone-Op"] != "create" {
+		t.Fatalf("commits in given order: %+v %v", byID, err)
+	}
 	var walked []CommitDiff
 	if err := r.Walk(ctx, c2, func(cd CommitDiff) error { walked = append(walked, cd); return nil }); err != nil {
 		t.Fatal(err)

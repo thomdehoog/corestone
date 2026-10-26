@@ -140,7 +140,9 @@ The server enforces the effective configuration at the artifact's location:
   descending order, rather than alphabetical order. Multiple-choice fields sort by their highest
   selected option in that sequence, regardless of selection order. Unlisted values follow configured
   options and sort alphabetically (reversed when descending); empty cells stay last in both directions.
-  Text and numeric columns keep their natural and numeric ordering.
+  Text and numeric columns keep their natural and numeric ordering. Each row uses its own folder's
+  effective schema, including scoped option orders, type labels and declared columns, even when
+  a search or subtree view combines artifacts with the same type name from different scopes.
 - **Workflow sorting:** workflow fields and the overview's State column use the sequence of the
   workflow's `states` list, reversed for descending order, not state names or transitions.
   The State column compares workflows in the type's declared `workflows` order, using subsequent

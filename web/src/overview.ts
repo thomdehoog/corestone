@@ -6,6 +6,7 @@ import { store, type State } from "./store";
 import type { Kind, Schema, Summary, Workflow } from "./types";
 import { compare, fieldSortValue, fieldValue, workflowKey, workflowSortValue, type SortValue } from "./sorting";
 import { kindIcon, relTime } from "./util";
+import { overviewDefinitions, schemaKey } from "./overview-definitions";
 
 // Artifact overview (design guide §7.4): every artifact matching the
 // navigation context in a table whose columns come from the schemas.
@@ -43,6 +44,7 @@ export class Overview extends LitElement {
   @state() private loading = false;
   @state() private error = "";
   @state() private schemas: Record<string, Schema> = {};
+  @state() private rowSchemas: Record<string, Schema> = {};
   @state() private workflows: Record<string, Workflow> = {};
   @state() private menu = false;
   @state() private layout = loadLayout();
@@ -86,24 +88,13 @@ export class Overview extends LitElement {
       ]);
       const map: Record<string, Schema> = {};
       for (const t of types.types) map[t.type] = t;
-      const requests = new Map<string, { row: Summary; id: string }>();
-      for (const row of res.artifacts) {
-        const schema = map[row.type];
-        const ids = [
-          ...(schema?.workflows ?? []), ...Object.keys(row.workflows ?? {}),
-          ...(schema?.fields ?? []).flatMap((f) => f.type === "workflow" && f.workflow ? [f.workflow] : []),
-        ];
-        for (const id of ids) requests.set(workflowKey(row, id), { row, id });
-      }
-      const workflows: Record<string, Workflow> = {};
-      await Promise.all([...requests].map(async ([key, { row, id }]) => {
-        workflows[key] = await api.workflowDef(id, row.type, row.folder);
-      }));
+      const definitions = await overviewDefinitions(res.artifacts, r.folder, types.types);
       this.rows = res.artifacts;
       this.total = res.total;
       this.below = deep ? deep.total : res.total;
       this.schemas = map;
-      this.workflows = workflows;
+      this.rowSchemas = definitions.schemas;
+      this.workflows = definitions.workflows;
     } catch (e) {
       this.error = String((e as Error).message ?? e);
       this.rows = [];
@@ -114,17 +105,17 @@ export class Overview extends LitElement {
 
   /** Columns: HID, title, type, workflow states, then schema-declared columns, then folder, social and modified. */
   private columns(): Column[] {
-    const type = (row: Summary) => this.schemas[row.type]?.displayName ?? row.type;
+    const type = (row: Summary) => this.rowSchemas[schemaKey(row)]?.displayName ?? row.type;
     return [
       { id: "$hid", name: "ID", value: (row) => row.hid || row.guid,
         render: (row) => row.hid ? html`<span class="hid">${row.hid}</span>` : html`<span class="muted mono">${row.guid.slice(0, 8)}</span>` },
       { id: "$title", name: "Title", value: (row) => row.title || row.kind, title: (row) => row.title ?? "",
         render: (row) => html`${kindIcon(row.kind)}${row.title || html`<span class="muted">${row.kind}</span>`}` },
       { id: "$type", name: "Type", value: type, render: type },
-      { id: "$state", name: "State", value: (row) => workflowSortValue(row, this.schemas[row.type], (id) => this.workflows[workflowKey(row, id)]),
+      { id: "$state", name: "State", value: (row) => workflowSortValue(row, this.rowSchemas[schemaKey(row)], (id) => this.workflows[workflowKey(row, id)]),
         render: (row) => html`${Object.entries(row.workflows ?? {}).map(([w, st]) => html`<span class="pill state" title=${w}>${st}</span> `)}` },
       ...this.fieldColumns().map((c): Column => ({ ...c,
-        value: (row) => fieldSortValue(row, c.id, this.schemas[row.type], (id) => this.workflows[workflowKey(row, id)]),
+        value: (row) => fieldSortValue(row, c.id, this.rowSchemas[schemaKey(row)], (id) => this.workflows[workflowKey(row, id)]),
         render: (row) => String(fieldValue(row, c.id) ?? "") })),
       { id: "$folder", name: "Folder", cls: "muted", value: (row) => row.folder, render: (row) => row.folder || "/" },
       { id: "$social", name: "Social", cls: "social", value: (row) => row.links, title: () => "links · comments",
@@ -138,12 +129,12 @@ export class Overview extends LitElement {
     const cols = new Map<string, string>();
     const wanted = new Set<string>();
     for (const row of this.rows) {
-      const s = this.schemas[row.type];
+      const s = this.rowSchemas[schemaKey(row)];
       const pres = (s?.presentation?.columns as string[] | undefined) ?? [];
       for (const c of pres) wanted.add(c);
     }
     for (const id of wanted) {
-      for (const s of Object.values(this.schemas)) {
+      for (const s of Object.values(this.rowSchemas)) {
         const f = s.fields?.find((x) => x.id === id);
         if (f) cols.set(id, f.name || id);
       }
@@ -157,7 +148,7 @@ export class Overview extends LitElement {
     const sort = this.layout.sort;
     const col = sort && cols.find((c) => c.id === sort.col);
     if (!col) return this.rows;
-    const key = [sort.col, sort.dir, this.schemas, this.workflows];
+    const key = [sort.col, sort.dir, this.rowSchemas, this.workflows];
     if (this.sorted?.rows === this.rows && this.sorted.key.every((k, i) => k === key[i])) return this.sorted.out;
     const dir = sort.dir === "asc" ? 1 : -1;
     const out = this.rows.map((row) => ({ row, v: col.value(row) })).sort((a, b) => compare(a.v, b.v, dir)).map((x) => x.row);

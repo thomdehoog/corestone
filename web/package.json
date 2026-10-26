@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "build": "node build.mjs",
     "watch": "node build.mjs --watch",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:overview": "node --test tests/overview-definitions.unit.mjs"
   },
   "dependencies": {
     "lit": "^3.3.0"

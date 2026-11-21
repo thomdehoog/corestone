@@ -2,7 +2,7 @@ import type { EditorView } from "prosemirror-view";
 import { linkAt, removeLink, setLink, type LinkTarget } from "./commands";
 import type { EntryFiles } from "./files";
 import { safeHref } from "./schema";
-import { button, el } from "@corestone/ui";
+import { button, el, Overlay } from "@corestone/ui";
 
 // Links: the popover that sets one (Ctrl+K or the toolbar), the bubble that
 // shows the link at the cursor (open, edit, remove), and opening links.
@@ -36,7 +36,7 @@ export class LinkUI {
   private readonly fileBtn: HTMLButtonElement;
   private readonly removeBtn: HTMLButtonElement;
   private readonly bubble: HTMLElement;
-  private outside?: (e: MouseEvent) => void;
+  private readonly overlay: Overlay;
   private shown = ""; // the link the bubble shows, to refresh it only on change
 
   constructor(
@@ -47,9 +47,8 @@ export class LinkUI {
     /** Lets the user pick or add a file of the entry. */
     private readonly pickFile: (chosen: (name: string) => void) => void,
   ) {
-    this.pop = el("div", "cs-linkpop");
-    this.pop.setAttribute("role", "dialog");
-    this.pop.setAttribute("aria-label", "Link");
+    this.overlay = new Overlay({ root, onEscape: () => this.view().focus() });
+    this.pop = this.overlay.panel("cs-linkpop", "dialog", "Link");
     this.input = el("input", "addr") as HTMLInputElement;
     this.input.placeholder = "https://…";
     this.input.setAttribute("aria-label", "Address");
@@ -65,15 +64,14 @@ export class LinkUI {
     this.pop.append(row, this.msg);
     this.input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") { e.preventDefault(); this.apply(); }
-      if (e.key === "Escape") { e.preventDefault(); this.close(true); }
     });
     this.input.addEventListener("input", () => { this.input.classList.remove("bad"); this.msg.textContent = ""; });
 
     this.bubble = el("div", "cs-linkbubble");
     // clicks in the bubble keep the cursor in the text
     this.bubble.addEventListener("mousedown", (e) => e.preventDefault());
-    this.pop.hidden = this.bubble.hidden = true;
-    root.append(this.pop, this.bubble);
+    this.bubble.hidden = true;
+    root.append(this.bubble);
   }
 
   get open() { return !this.pop.hidden; }
@@ -90,19 +88,15 @@ export class LinkUI {
     this.fileBtn.hidden = !this.files();
     this.removeBtn.hidden = !at && !view.state.doc.rangeHasMark(view.state.selection.from, view.state.selection.to, view.state.schema.marks.link);
     this.bubble.hidden = true;
-    this.pop.hidden = false;
-    this.place(this.pop, at?.from ?? view.state.selection.from);
+    const c = view.coordsAtPos(at?.from ?? view.state.selection.from);
+    this.overlay.open(this.pop, { x: c.left, y: c.bottom + 4 });
     this.input.focus();
     this.input.select();
-    this.outside = (e) => { if (!this.pop.contains(e.target as Node)) this.close(false); };
-    document.addEventListener("mousedown", this.outside, true);
   }
 
   close(refocus: boolean) {
     if (this.pop.hidden) return;
-    this.pop.hidden = true;
-    if (this.outside) document.removeEventListener("mousedown", this.outside, true);
-    this.outside = undefined;
+    this.overlay.close();
     if (refocus) this.view().focus();
   }
 
@@ -183,7 +177,7 @@ export class LinkUI {
 
   hideBubble() { this.bubble.hidden = true; this.shown = ""; }
 
-  /** Puts a panel under the text at pos, inside the editor. */
+  /** Puts the bubble under the text at pos, inside the editor (the popover is the overlay's to place). */
   private place(panel: HTMLElement, pos: number) {
     const view = this.view();
     const c = view.coordsAtPos(pos);

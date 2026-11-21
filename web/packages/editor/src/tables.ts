@@ -7,9 +7,8 @@ import {
 import type { EditorView } from "prosemirror-view";
 import { icon } from "./icons";
 import { buildMenu, runItem, type MenuItem } from "./menu";
-import { hexColor, schema, tableClass, tableStyle, type Borders, type Stripes } from "./schema";
-import type { ColorChoices } from "./toolbar";
-import { button, dialogHead, el, Overlay } from "@corestone/ui";
+import { schema, tableClass, tableStyle, type Borders, type Stripes } from "./schema";
+import { button, customColor, dialogHead, el, Overlay, swatch, type ColorChoices } from "@corestone/ui";
 
 // Tables: inserting one (a size grid), the context menu (rows, columns,
 // header format, merging) and the Properties dialog (size, stripes,
@@ -225,7 +224,7 @@ export class TableUI {
     mark(0, 0);
     this.grid.append(label, cells);
 
-    this.menu = this.overlay.panel("cs-menu cs-tablemenu", "menu", "Table");
+    this.menu = this.overlay.panel("ui-pop ui-menu cs-menu cs-tablemenu", "menu", "Table");
     this.props = this.overlay.panel("cs-tableprops", "dialog", "Table properties");
     this.colorPop = el("div", "colorpop");
   }
@@ -396,26 +395,12 @@ export class TableUI {
   private pickColor(anchor: HTMLElement, set: (v: string) => void) {
     this.colorPop.replaceChildren();
     const done = (v: string) => { this.colorPop.hidden = true; set(v); };
-    const swatch = (v: string, label = v) => {
-      const b = el("button", "sw") as HTMLButtonElement;
-      b.type = "button";
-      b.style.background = v;
-      b.title = label;
-      b.setAttribute("aria-label", label);
-      b.addEventListener("click", (e) => { e.preventDefault(); done(v); });
-      return b;
-    };
-    this.colorPop.append(...this.colors.swatches.map((v) => swatch(v)));
+    // the dialog has no tooltips of its own: the browser's show the labels
+    const titled = <T extends HTMLElement>(b: T, label: string) => { b.title = label; return b; };
+    this.colorPop.append(...this.colors.swatches.map((v) => titled(swatch(v, done), v)));
     if (this.colors.custom) {
-      const picker = el("label", "pick");
-      picker.title = "Custom color…";
-      picker.innerHTML = icon("pick", 16) + '<input type="color" tabindex="-1" aria-label="Custom color">';
-      const input = picker.querySelector("input")!;
-      input.addEventListener("change", () => {
-        const v = hexColor(input.value);
-        if (v) { this.colors.addRecent(v); done(v); }
-      });
-      this.colorPop.append(picker, ...this.colors.recent().map((v) => swatch(v, "Recent: " + v)));
+      const picker = titled(customColor("pick", icon("pick", 16), (v) => { this.colors.addRecent(v); done(v); }), "Custom color…");
+      this.colorPop.append(picker, ...this.colors.recent().map((v) => titled(swatch(v, done, "Recent: " + v), "Recent: " + v)));
     }
     this.colorPop.hidden = false;
     const p = this.props.getBoundingClientRect(), a = anchor.getBoundingClientRect();

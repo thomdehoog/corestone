@@ -1,6 +1,7 @@
 /* @corestone/ui: the look of its blocks. The page gives the colours as
-   --ui-* variables on .ui-pop (panel, text, border, shadow, hover, muted,
-   accent, error); without them the browser's system colours show. */
+   --ui-* variables on .ui-pop or on an element around the blocks (panel,
+   text, border, shadow, hover, muted, accent, error); without them the
+   browser's system colours show. */
 
 /* A floating panel of an Overlay. */
 .ui-pop { position: absolute; z-index: 40; min-width: 240px; max-width: min(460px, 90vw); max-height: 60vh; overflow: auto; padding: 8px;
@@ -10,14 +11,39 @@
 
 /* A panel that is a menu: a column of items. */
 .ui-pop.ui-menu { display: flex; flex-direction: column; min-width: 96px; padding: 6px; }
+.ui-pop.ui-menu:has(.sub) { overflow: visible; max-height: none; } /* a submenu stands beside the panel: nothing may cut it off */
 
 /* The items buildMenu makes, wherever they stand in a panel. */
 .ui-pop .mi { display: flex; align-items: center; width: 100%; text-align: left; white-space: nowrap; border: none; background: none; color: inherit; font: inherit;
   padding: 6px 10px; border-radius: 7px; cursor: pointer; position: relative; }
 .ui-pop .mi:is(:hover, :focus-visible):not(:disabled) { background: var(--ui-hover, Highlight); outline: none; }
-.ui-pop .mi[aria-checked=true] { font-weight: 700; color: var(--ui-accent, LinkText); }
+.ui-pop .mi[aria-expanded=true] { background: var(--ui-hover, Highlight); }
+/* Check items: a mark in front, in a margin every item of that menu keeps free. */
+:is(.ui-menu, .ui-pop .sub):has(> .mi[aria-checked]) > .mi, :is(.ui-menu, .ui-pop .sub):has(> .mi[aria-checked]) > .has-sub > .mi { padding-left: 26px; }
+.ui-pop .mi[aria-checked=true]::before { content: "✓"; position: absolute; left: 9px; }
+/* An item with a submenu, and the submenu beside it. */
+.ui-pop .has-sub { position: relative; display: flex; flex-direction: column; }
+.ui-pop .mi[aria-haspopup]::after { content: "▸"; margin-left: auto; padding-left: 16px; color: var(--ui-muted, GrayText); }
+.ui-pop .sub { position: absolute; left: 100%; top: -7px; z-index: 1; display: flex; flex-direction: column; min-width: 96px; padding: 6px;
+  background: var(--ui-panel, Canvas); color: var(--ui-text, CanvasText); border: 1px solid var(--ui-border, GrayText); border-radius: 10px;
+  box-shadow: var(--ui-shadow, 0 8px 30px rgba(0, 0, 0, 0.2)); }
+.ui-pop .sub[hidden] { display: none; }
 .ui-pop .mi:disabled { color: var(--ui-muted, GrayText); cursor: default; }
 .ui-pop .mi.danger:not(:disabled) { color: var(--ui-error, #d14343); }
 .ui-pop .mi-icon { display: inline-flex; gap: 3px; margin-right: 8px; }
 /* A heading above a group of items. */
 .ui-pop .group { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--ui-muted, GrayText); padding: 6px 10px 2px; }
+
+/* The head of a small dialog (dialogHead): title on the left, close button on the right. */
+.ui-head { display: flex; align-items: center; justify-content: space-between; }
+.ui-head .title { font-weight: 600; }
+.ui-head button.x { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px;
+  background: transparent; color: var(--ui-muted, GrayText); cursor: pointer; }
+.ui-head button.x:hover { background: var(--ui-hover, Highlight); }
+
+/* The tooltip of attachTooltips: dark and translucent on any page; the first line of an unavailable control stands out. */
+.ui-tip { position: fixed; max-width: 260px; background: rgba(31,35,40,.5); -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px);
+  text-shadow: 0 1px 2px rgba(0,0,0,.6); color: #fff; font-size: 12px; line-height: 1.4; padding: 7px 10px; border-radius: 6px;
+  pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 20; }
+.ui-tip.on { opacity: 1; }
+.ui-tip b { display: block; color: #ffb4a8; font-weight: 600; }

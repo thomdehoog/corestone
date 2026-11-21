@@ -406,11 +406,7 @@ export class DocumentView extends LightElement {
     }
     const blocks = this.asText(v.meta.title || v.meta.hid || "", schema, ((v.data as Record<string, unknown>).fields as Record<string, unknown>) ?? {});
     const names = fileNames(blocks);
-    const renamed = await this.copyFiles(names, async (n) => {
-      const res = await fetch(api.fileUrl(guid, n), { credentials: "same-origin" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.blob();
-    }, (_n, f) => this.docFiles.add(f));
+    const renamed = await this.copyFiles(names, (n) => api.fileBlob(api.fileUrl(guid, n)), (_n, f) => this.docFiles.add(f));
     return { text: renameFiles(blocks, renamed) };
   }
 
@@ -500,9 +496,7 @@ export class DocumentView extends LightElement {
     get: async (name) => {
       const p = this.pendingFiles.find((f) => f.name === name);
       if (p) return p;
-      const res = await fetch(api.fileUrl(this.guid, name), { credentials: "same-origin" });
-      if (!res.ok) throw new Error(`the file could not be read (${res.status})`);
-      return res.blob();
+      return api.fileBlob(api.fileUrl(this.guid, name));
     },
   };
 

@@ -2,7 +2,8 @@ import { html, nothing } from "lit";
 import { LightElement, errorText } from "@corestone/ui";
 import { customElement, state } from "lit/decorators.js";
 import { api, type Account } from "./api";
-import { store, type State, type Theme } from "./store";
+import { store, type State } from "./store";
+import { themeChoice } from "./components/theme-choice";
 
 // Local accounts (-auth local): the sign-in page shown instead of the
 // application, and the account dialog behind the header's user button.
@@ -165,13 +166,6 @@ export class AccountDialog extends LightElement {
         @click=${() => { this.error = ""; this.resetting = null; this.deleting = a.guid; }}>✕</button>`}</span>`;
   }
 
-  private themeChoice() {
-    const themes: [Theme, string][] = [["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]];
-    return html`<div class="theme-choice" role="radiogroup" aria-label="Theme"><span class="muted small">Theme</span>
-      ${themes.map(([t, name]) => html`<button type="button" role="radio" data-theme-choice=${t} aria-checked=${this.s.theme === t ? "true" : "false"}
-        class="btn sm ${this.s.theme === t ? "primary" : ""}" title=${t === "auto" ? "Follow the system setting" : ""} @click=${() => store.setTheme(t)}>${name}</button>`)}</div>`;
-  }
-
   private manageView(me: Account) {
     return html`<section class="account-section" data-test="manage-accounts">
       <h3>Accounts</h3>
@@ -211,7 +205,7 @@ export class AccountDialog extends LightElement {
         <label>Repeat new password<input type="password" name="repeat" required autocomplete="new-password"></label>
         <div class="foot"><button type="submit" class="btn">Change password</button></div>
       </form>
-      ${this.themeChoice()}
+      ${themeChoice(this.s.theme, (t) => store.setTheme(t))}
       ${this.error ? html`<div class="notice error" data-test="account-error">${this.error}</div>` : nothing}
       ${this.manage ? this.manageView(me) : nothing}
       <div class="foot">

@@ -1,5 +1,6 @@
 import { Schema, type Mark, type MarkSpec, type Node, type NodeSpec } from "prosemirror-model";
 import { tableNodes } from "prosemirror-tables";
+import { safeHref as safeUrl } from "@corestone/ui";
 
 // The editor's document model. Only what is listed here can exist in the
 // editor: pasted HTML is reduced to these nodes and marks, everything else
@@ -257,13 +258,12 @@ const valued = (style: string, read: (css: string) => string | number | null, cs
   toDOM: (m: Mark) => ["span", { style: css(String(m.attrs.value)) }, 0],
 });
 
-/** A web address the editor links to: http(s), mailto or ftp only (no javascript: and the like). */
+/** A web address the editor links to: one safeUrl allows (no javascript: and the like), without spaces and of a length the server takes. */
 export function safeHref(v: string | null | undefined): string | null {
   const t = (v ?? "").trim();
   if (!t || /\s/.test(t) || t.length > 2048) return null;
-  if (/^(https?:\/\/|mailto:|ftp:\/\/)/i.test(t)) return t;
   if (/^www\.[^/]+\.[a-z]{2,}/i.test(t)) return "https://" + t; // typed without the scheme
-  return null;
+  return safeUrl(t);
 }
 
 export const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;

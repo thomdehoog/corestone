@@ -4,7 +4,8 @@ import { customElement, state } from "lit/decorators.js";
 import { live } from "lit/directives/live.js";
 import { api } from "./api";
 import { navigate } from "./router";
-import { store, type Dialog, type State, type Theme } from "./store";
+import { store, type Dialog, type State } from "./store";
+import { themeChoice } from "./components/theme-choice";
 import type { RichText } from "@corestone/editor";
 import type { Kind, PickerAction, Schema, SortLevel, Summary, TableFilter, View } from "./types";
 import type { Table, TableColumn } from "./components/table";
@@ -125,17 +126,10 @@ export class Dialogs extends LightElement {
         ${d.folder
           ? html`<corestone-folder-field test="prompt" .value=${(d.value as string) ?? ""} .ignore=${(d.ignore as string) ?? ""}></corestone-folder-field>`
           : html`<input type="text" data-test="prompt" .value=${(d.value as string) ?? ""} placeholder=${(d.placeholder as string) ?? ""} aria-label=${d.title as string}>`}
-        ${d.theme ? this.themeChoice() : nothing}
+        ${d.theme ? themeChoice(this.s.theme, (t) => store.setTheme(t)) : nothing}
         <div class="foot"><button type="button" class="btn" @click=${() => this.dismiss()}>Cancel</button>
         <button type="submit" class="btn primary">${(d.confirmLabel as string) ?? "OK"}</button></div>
       </form>`;
-  }
-
-  private themeChoice() {
-    const themes: [Theme, string][] = [["auto", "Auto"], ["light", "Light"], ["dark", "Dark"]];
-    return html`<div class="theme-choice" role="radiogroup" aria-label="Theme"><span class="muted small">Theme</span>
-      ${themes.map(([t, name]) => html`<button type="button" role="radio" data-theme-choice=${t} aria-checked=${this.s.theme === t ? "true" : "false"}
-        class="btn sm ${this.s.theme === t ? "primary" : ""}" title=${t === "auto" ? "Follow the system setting" : ""} @click=${() => store.setTheme(t)}>${name}</button>`)}</div>`;
   }
 
   private confirm(d: Dialog) {

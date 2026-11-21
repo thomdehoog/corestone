@@ -109,11 +109,11 @@ export class Overlay {
 }
 
 /**
- * The head of a small dialog: its title and a close button showing the given
- * markup (an icon). With `close`, a click on the button calls it.
+ * The head of a small dialog (.ui-head in ui.css): its title and a close button
+ * showing the given markup (an icon). With `close`, a click on the button calls it.
  */
 export function dialogHead(title: string, closeIcon: string, close?: () => void): { head: HTMLElement; x: HTMLButtonElement } {
-  const head = el("div", "head");
+  const head = el("div", "head ui-head");
   const text = el("span", "title");
   text.textContent = title;
   const x = button({ cls: "x", label: "Close", html: closeIcon, run: close });

@@ -21,7 +21,8 @@ import { FormulaUI, FormulaView, formulaPictures, selectedFormula } from "./form
 import { LinkUI, openLink, type ItemLinks } from "./links";
 import { StyledTableView, TableUI, flattenNestedTables, nextCell, prevCell, tableAt, tableEdges } from "./tables";
 import { safeHref, schema } from "./schema";
-import { DEFAULT_PALETTE, Toolbar, type Palette } from "./toolbar";
+import { DEFAULT_PALETTE, Toolbar } from "./toolbar";
+import type { Palette } from "@corestone/ui";
 
 export interface EditorOptions {
   /** The stored value: plain text or paragraphs; in a document, its content. */

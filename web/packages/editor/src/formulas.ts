@@ -237,7 +237,7 @@ export class FormulaUI {
       onClose: () => window.clearTimeout(this.timer),
     });
     this.dialog = this.overlay.panel("cs-formulapop", "dialog", "Formula");
-    this.menu = this.overlay.panel("cs-menu cs-formulamenu", "menu", "Formula");
+    this.menu = this.overlay.panel("ui-pop ui-menu cs-menu cs-formulamenu", "menu", "Formula");
   }
 
   /** Writes a new formula, or the selected one. */

@@ -18,7 +18,7 @@ export class DocumentUI {
   constructor(private readonly view: () => EditorView, root: HTMLElement, private readonly host: () => DocumentHost | undefined,
     private readonly notice: (msg: string) => void) {
     this.overlay = new Overlay({ root, onEscape: () => this.view().focus() });
-    this.menu = this.overlay.panel("cs-menu cs-placementmenu", "menu", "Entry");
+    this.menu = this.overlay.panel("ui-pop ui-menu cs-menu cs-placementmenu", "menu", "Entry");
     this.picker = this.overlay.panel("cs-xrefpop", "dialog", "Cross-reference");
   }
 

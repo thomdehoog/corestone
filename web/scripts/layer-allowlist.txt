@@ -3,8 +3,6 @@
 
 # Only api.ts talks to the server.
 packages/editor/src/files.ts: uses fetch
-src/detail.ts: uses fetch
-src/document.ts: uses fetch
 
 # Components of the application get their data handed in; they do not fetch it
 # or reach into the store (refactoring plan, phase 4 and step A.6).

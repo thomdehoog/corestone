@@ -230,3 +230,6 @@ export interface PickOptions {
 
 /** A picker footer action besides picking a row; "add" shows a green ＋, "remove" a red ✕. */
 export interface PickerAction { label: string; test: string; tone: "add" | "remove"; run: () => void }
+
+/** The colour theme; "auto" follows the system setting. */
+export type Theme = "auto" | "light" | "dark";

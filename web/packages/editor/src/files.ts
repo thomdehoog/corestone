@@ -236,7 +236,7 @@ export class FileUI {
   constructor(private readonly view: () => EditorView, root: HTMLElement, private readonly files: () => EntryFiles | undefined) {
     this.overlay = new Overlay({ root, keepFocus: "input, label", onEscape: () => this.view().focus() });
     this.picker = this.overlay.panel("cs-filepop", "dialog");
-    this.menu = this.overlay.panel("cs-menu cs-imagemenu", "menu", "Image");
+    this.menu = this.overlay.panel("ui-pop ui-menu cs-menu cs-imagemenu", "menu", "Image");
     this.altPop = this.overlay.panel("cs-altpop", "dialog", "Alternative text");
     this.note = el("div", "cs-notice");
     this.note.setAttribute("role", "status");

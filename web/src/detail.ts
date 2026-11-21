@@ -1,5 +1,5 @@
 import { html, nothing, type TemplateResult } from "lit";
-import { deepEqual, drag, DropMenu, errorText, fmtSize, fmtTime, LightElement, prefs } from "@corestone/ui";
+import { deepEqual, drag, DropMenu, errorText, fmtSize, fmtTime, LightElement, prefs, section } from "@corestone/ui";
 import { customElement, property, state } from "lit/decorators.js";
 import type { EntryFiles } from "@corestone/editor";
 import { api, ApiError, type SaveChanges, type SaveConflict, type SaveConflictItem } from "./api";
@@ -428,9 +428,7 @@ export class Detail extends LightElement {
     get: async (name) => {
       const p = this.pending.files.find((f) => f.name === name);
       if (p) return p;
-      const res = await fetch(this.entryFiles.url(name), { credentials: "same-origin" });
-      if (!res.ok) throw new Error(`the file could not be read (${res.status})`);
-      return res.blob();
+      return api.fileBlob(this.entryFiles.url(name));
     },
   };
 
@@ -777,14 +775,9 @@ export class Detail extends LightElement {
   /** A collapsible section; actions stay in the heading so they work while closed. */
   private section(s: Section, body: () => unknown, actions: unknown = nothing) {
     const open = this.isOpen(s);
-    const count = this.sectionCount(s);
-    const change = this.sectionChange(s);
-    return html`<section class="section ${open ? "" : "collapsed"} ${change.length ? "changed" : ""}" id=${"sec-" + s}><h3>
-      <button class="sec-toggle" data-test=${"toggle-" + s} aria-expanded=${open} @click=${() => this.setOpen(s, !open)}>
-        <span class="chev">${open ? "▾" : "▸"}</span>${this.sectionName(s)}${count ? html`<span class="n">${count}</span>` : nothing}
-        ${change.map((t) => html`<span class="change-badge ${t.endsWith("removed") ? "is-removed" : t.endsWith("added") ? "is-added" : ""}" data-test="change-badge">${t}</span>`)}</button>
-      <span class="actions">${actions}</span></h3>
-      ${open ? body() : nothing}</section>`;
+    return section({ id: s, title: this.sectionName(s), count: this.sectionCount(s), open, actions, body,
+      badges: this.sectionChange(s).map((t) => ({ text: t, cls: t.endsWith("removed") ? "is-removed" : t.endsWith("added") ? "is-added" : "" })),
+      onToggle: (to) => this.setOpen(s, to) });
   }
   private sectionName(s: string) { return { comment: "Comment", fields: "Fields", relationships: "Relationships", comments: "Comments", attachments: "Attachments", documents: "Documents", overlay: "Overlay", history: "History", metadata: "Metadata" }[s] ?? s; }
   private sectionCount(s: string): string {

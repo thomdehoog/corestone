@@ -6,14 +6,15 @@ import type { DocNode, RichText } from "./model";
 import type { DocumentHost, OutlineItem } from "./structure";
 import type { ItemLinks } from "./links";
 import type { EntryFiles } from "./files";
-import type { Palette } from "./toolbar";
+import type { Palette } from "@corestone/ui";
 
 export { RichTextEditor, type EditorOptions } from "./editor";
 export { type ItemLinks } from "./links";
 export { type EntryFiles } from "./files";
 export { documentFromStorage, documentText, documentTitle, documentToStorage, fileNames, fromStorage, isEntryNode, isSectionNode, isTable, isTocNode, newSectionId, plainText, renameFiles, toStorage,
   type DocNode, type EntryNode, type SectionNode, type TocNode, type Block, type Cell, type DiagramRun, type FormulaRun, type ImageRun, type Marks, type Paragraph, type RichText, type Run, type Table } from "./model";
-export { DEFAULT_PALETTE, DEFAULT_STRIPES, type Palette, type StripePreset } from "./toolbar";
+export { DEFAULT_PALETTE, DEFAULT_STRIPES } from "./toolbar";
+export type { Palette, StripePreset } from "@corestone/ui";
 export { FONTS, SIZES, SIZE_MAX, SIZE_MIN } from "./schema";
 export { numbering, type DocumentHost, type OutlineItem, type Placed } from "./structure";
 export type { EntryTypeChoice } from "./toolbar";

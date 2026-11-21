@@ -1,4 +1,4 @@
-import type { PickOptions, RepoStatus, Summary, View } from "./types";
+import type { PickOptions, RepoStatus, Summary, Theme, View } from "./types";
 import { errorText, prefs } from "@corestone/ui";
 import type { Account } from "./api";
 
@@ -19,7 +19,6 @@ export interface Route {
   at: string;            // the commit that version is viewed at
 }
 
-export type Theme = "auto" | "light" | "dark";
 
 export interface Toast { id: number; text: string; level: "info" | "error" | "success"; action?: { label: string; run: () => void } }
 
